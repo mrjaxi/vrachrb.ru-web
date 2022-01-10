@@ -1018,10 +1018,13 @@ class Doctrine_Query extends Doctrine_Query_Abstract implements Countable
             if ($k === 0) {
                 if ( ! $ignorePending && $this->_type == self::SELECT) {
                     // We may still have pending conditions
+
                     $alias = count($e) > 1
                         ? $this->getComponentAlias($e[1])
                         : null;
                     $where = $this->_processPendingJoinConditions($alias);
+
+
 
                     // apply inheritance to WHERE part
                     if ( ! empty($where)) {
@@ -1347,6 +1350,8 @@ class Doctrine_Query extends Doctrine_Query_Abstract implements Countable
                 }
             }
         }
+
+
 
         $q .= ( ! empty($this->_sqlParts['groupby'])) ? ' GROUP BY ' . implode(', ', $this->_sqlParts['groupby'])  : '';
         $q .= ( ! empty($this->_sqlParts['having'])) ?  ' HAVING '   . implode(' AND ', $this->_sqlParts['having']): '';

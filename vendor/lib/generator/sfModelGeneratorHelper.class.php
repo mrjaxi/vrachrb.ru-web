@@ -28,16 +28,16 @@ abstract class sfModelGeneratorHelper
     {
       return '';
     }
-    
+
     $p = array('method' => 'delete', 'confirm' => !empty($params['confirm']) ? __($params['confirm'], array(), 'sf_admin') : $params['confirm']);
 
-    
+
     if(isset($params['fields']))
     {
       $p = array_merge(array('fields' => $params['fields']), $p);
     }
-    
-    return '<li class="sf_admin_action_delete">' . link_to(__($params['label'], array(), 'sf_admin'), $this->getUrlForAction('delete'), $object, $p).'</li>';
+
+    return '<li class="sf_admin_action_delete">' . link_to('<i style="font-size:16px;" class="fa fa-trash-o" aria-hidden="true"></i>', $this->getUrlForAction('delete'), $object, $p).'</li>';
   }
 
   public function linkToList($params)
@@ -59,7 +59,7 @@ abstract class sfModelGeneratorHelper
 
     return '<li class="sf_admin_action_save_and_add"><input type="submit" value="'.__($params['label'], array(), 'sf_admin').'" name="_save_and_add" /></li>';
   }
-  
+
   public function linkToSaveAndList($object, $params)
   {
     return '<li class="sf_admin_action_save_and_list"><input type="submit" value="'.__($params['label'], array(), 'sf_admin').'" name="_save_and_list" /></li>';

@@ -47,9 +47,9 @@ class sfValidatorDate extends sfValidatorBase
    */
   protected function configure($options = array(), $messages = array())
   {
-    $this->addMessage('bad_format', '"%value%" does not match the date format (%date_format%).');
-    $this->addMessage('max', 'The date must be before %max%.');
-    $this->addMessage('min', 'The date must be after %min%.');
+    $this->addMessage('bad_format', '"%value%" не соответствует формату даты (%date_format%).');
+    $this->addMessage('max', 'Дата должна быть меньше %max%.');
+    $this->addMessage('min', 'Дата должна быть больше %min%.');
 
     $this->addOption('date_format', null);
     $this->addOption('with_time', false);

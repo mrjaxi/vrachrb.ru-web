@@ -41,38 +41,38 @@ abstract class Doctrine_Relation implements ArrayAccess
      * constant for ONE_TO_ONE and MANY_TO_ONE relationships
      */
     const ONE   = 0;
-    
+
     /**
      * constant for MANY_TO_MANY and ONE_TO_MANY relationships
      */
     const MANY  = 1;
-    
+
     // TRUE => mandatory, everything else is just a default value. this should be refactored
     // since TRUE can bot be used as a default value this way. All values should be default values.
     /**
      * @var array $definition   @see __construct()
      */
     protected $definition = array('alias'       => true,
-                                  'foreign'     => true,
-                                  'local'       => true,
-                                  'class'       => true,
-                                  'type'        => true,
-                                  'table'       => true,
-                                  'localTable'  => true,
-                                  'name'        => null,
-                                  'refTable'    => null,
-                                  'onDelete'    => null,
-                                  'onUpdate'    => null,
-                                  'deferred'    => null,
-                                  'deferrable'  => null,
-                                  'constraint'  => null,
-                                  'equal'       => false,
-                                  'cascade'     => array(), // application-level cascades
-                                  'owningSide'  => false, // whether this is the owning side
-                                  'refClassRelationAlias' => null,
-                                  'foreignKeyName' => null,
-                                  'orderBy' => null
-                                  );
+        'foreign'     => true,
+        'local'       => true,
+        'class'       => true,
+        'type'        => true,
+        'table'       => true,
+        'localTable'  => true,
+        'name'        => null,
+        'refTable'    => null,
+        'onDelete'    => null,
+        'onUpdate'    => null,
+        'deferred'    => null,
+        'deferrable'  => null,
+        'constraint'  => null,
+        'equal'       => false,
+        'cascade'     => array(), // application-level cascades
+        'owningSide'  => false, // whether this is the owning side
+        'refClassRelationAlias' => null,
+        'foreignKeyName' => null,
+        'orderBy' => null
+    );
 
     protected $_isRefClass = null;
 
@@ -93,10 +93,10 @@ abstract class Doctrine_Relation implements ArrayAccess
      *          refTable                the reference table object (if any)
      *
      *          onDelete                referential delete action
-     *  
+     *
      *          onUpdate                referential update action
      *
-     *          deferred                deferred constraint checking 
+     *          deferred                deferred constraint checking
      *
      *          alias                   relation alias
      *
@@ -114,10 +114,10 @@ abstract class Doctrine_Relation implements ArrayAccess
      *          in the parent table or in the child table.
      *
      * SET NULL: Delete or update the row from the parent table and set the foreign key column or columns in the
-     *          child table to NULL. This is valid only if the foreign key columns do not have the NOT NULL qualifier 
+     *          child table to NULL. This is valid only if the foreign key columns do not have the NOT NULL qualifier
      *          specified. Both ON DELETE SET NULL and ON UPDATE SET NULL clauses are supported.
      *
-     * NO ACTION: In standard SQL, NO ACTION means no action in the sense that an attempt to delete or update a primary 
+     * NO ACTION: In standard SQL, NO ACTION means no action in the sense that an attempt to delete or update a primary
      *           key value is not allowed to proceed if there is a related foreign key value in the referenced table.
      *
      * RESTRICT: Rejects the delete or update operation for the parent table. NO ACTION and RESTRICT are the same as
@@ -135,7 +135,7 @@ abstract class Doctrine_Relation implements ArrayAccess
             if (isset($definition[$key])) {
                 $def[$key] = $definition[$key];
             } else {
-                $def[$key] = $this->definition[$key];          
+                $def[$key] = $this->definition[$key];
             }
         }
         $this->definition = $def;
@@ -150,8 +150,8 @@ abstract class Doctrine_Relation implements ArrayAccess
     public function hasConstraint()
     {
         return ($this->definition['constraint'] ||
-                ($this->definition['onUpdate']) ||
-                ($this->definition['onDelete']));
+            ($this->definition['onUpdate']) ||
+            ($this->definition['onDelete']));
     }
 
     public function isDeferred()
@@ -179,7 +179,7 @@ abstract class Doctrine_Relation implements ArrayAccess
         if (isset($this->definition[$offset])) {
             return $this->definition[$offset];
         }
-        
+
         return null;
     }
 
@@ -200,7 +200,7 @@ abstract class Doctrine_Relation implements ArrayAccess
      *
      * @return array
      */
-    public function toArray() 
+    public function toArray()
     {
         return $this->definition;
     }
@@ -227,7 +227,7 @@ abstract class Doctrine_Relation implements ArrayAccess
     {
         return $this->definition['type'];
     }
-    
+
     /**
      * Checks whether this relation cascades deletions to the related objects
      * on the application level.
@@ -248,8 +248,8 @@ abstract class Doctrine_Relation implements ArrayAccess
     final public function getTable()
     {
         return Doctrine_Manager::getInstance()
-               ->getConnectionForComponent($this->definition['class'])
-               ->getTable($this->definition['class']);
+            ->getConnectionForComponent($this->definition['class'])
+            ->getTable($this->definition['class']);
     }
 
     /**
@@ -273,7 +273,7 @@ abstract class Doctrine_Relation implements ArrayAccess
     {
         return $this->definition['local'];
     }
-    
+
     /**
      * getLocalFieldName
      * returns the field name of the local column
@@ -305,7 +305,7 @@ abstract class Doctrine_Relation implements ArrayAccess
     {
         return $this->definition['foreign'];
     }
-    
+
     /**
      * getLocalFieldName
      * returns the field name of the foreign column
@@ -323,7 +323,7 @@ abstract class Doctrine_Relation implements ArrayAccess
      */
     final public function getForeignColumnName()
     {
-       return $this->definition['table']->getColumnName($this->definition['foreign']);
+        return $this->definition['table']->getColumnName($this->definition['foreign']);
     }
 
     /**
@@ -348,9 +348,9 @@ abstract class Doctrine_Relation implements ArrayAccess
         $component = $this->getTable()->getComponentName();
 
         $dql  = 'FROM ' . $component
-              . ' WHERE ' . $component . '.' . $this->definition['foreign']
-              . ' IN (' . substr(str_repeat('?, ', $count), 0, -2) . ')'
-              . $this->getOrderBy($component);
+            . ' WHERE ' . $component . '.' . $this->definition['foreign']
+            . ' IN (' . substr(str_repeat('?, ', $count), 0, -2) . ')'
+            . $this->getOrderBy($component);
 
         return $dql;
     }
@@ -388,7 +388,7 @@ abstract class Doctrine_Relation implements ArrayAccess
     public function getOrderBy($alias = null, $columnNames = false)
     {
         if ( ! $alias) {
-           $alias = $this->getTable()->getComponentName();
+            $alias = $this->getTable()->getComponentName();
         }
 
         if ($orderBy = $this->getOrderByStatement($alias, $columnNames)) {
@@ -408,7 +408,7 @@ abstract class Doctrine_Relation implements ArrayAccess
         $table = $this->getTable();
 
         if ( ! $alias) {
-           $alias = $table->getComponentName();
+            $alias = $table->getComponentName();
         }
 
         if (isset($this->definition['orderBy'])) {

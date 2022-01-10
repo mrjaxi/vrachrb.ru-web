@@ -253,6 +253,7 @@ class Doctrine_Table extends Doctrine_Configurable implements Countable
         }
 
         if ($initDefinition) {
+
             $this->record = $this->initDefinition();
 
             $this->initIdentifier();
@@ -271,6 +272,9 @@ class Doctrine_Table extends Doctrine_Configurable implements Countable
 
         $this->_filters[]  = new Doctrine_Record_Filter_Standard();
         $this->_repository = new Doctrine_Table_Repository($this);
+
+
+
 
         $this->construct();
     }
@@ -396,6 +400,8 @@ class Doctrine_Table extends Doctrine_Configurable implements Countable
         if ( ! isset($this->_options['tableName'])) {
             $this->setTableName(Doctrine_Inflector::tableize($class->getName()));
         }
+
+
 
         return $record;
     }
@@ -652,6 +658,7 @@ class Doctrine_Table extends Doctrine_Configurable implements Countable
         $columns = array();
         $primary = array();
 
+
         foreach ($this->getColumns() as $name => $definition) {
 
             if (isset($definition['owner'])) {
@@ -672,8 +679,7 @@ class Doctrine_Table extends Doctrine_Configurable implements Countable
             }
         }
 
-        $options['foreignKeys'] = isset($this->_options['foreignKeys']) ?
-                $this->_options['foreignKeys'] : array();
+        $options['foreignKeys'] = isset($this->_options['foreignKeys']) ? $this->_options['foreignKeys'] : array();
 
         if ($parseForeignKeys && $this->getAttribute(Doctrine_Core::ATTR_EXPORT) & Doctrine_Core::EXPORT_CONSTRAINTS) {
 

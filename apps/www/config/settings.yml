@@ -5,9 +5,7 @@ prod:
 
 dev:
   .settings:
-#    error_reporting: <?php echo (E_ALL | E_STRICT)."\n" ?>
-#    error_reporting: <?php echo (E_ALL ^ E_STRICT ^ E_NOTICE ^ E_DEPRECATED ^ E_USER_DEPRECATED)."\n" ?>
-    error_reporting: <?php echo ((E_ALL) ^ E_NOTICE)."\n" ?>
+    error_reporting: <?php echo (E_ALL ^ E_STRICT ^ E_NOTICE ^ E_DEPRECATED ^ E_USER_DEPRECATED)."\n" ?>
     web_debug: false
     cache: false
     etag: false

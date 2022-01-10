@@ -112,6 +112,7 @@ class Doctrine_Migration_Diff
         $this->_cleanup();
 
         $from = $this->_generateModels(self::$_fromPrefix, $this->_from);
+
         $to = $this->_generateModels(
             Doctrine_Manager::getInstance()->getAttribute(Doctrine_Core::ATTR_MODEL_CLASS_PREFIX) . self::$_toPrefix,
             $this->_to
@@ -135,7 +136,7 @@ class Doctrine_Migration_Diff
     /**
      * Initialize some Doctrine models at a given path.
      *
-     * @param string $path 
+     * @param string $path
      * @return array $models
      */
     protected function _initializeModels($path)
@@ -188,6 +189,7 @@ class Doctrine_Migration_Diff
     protected function _buildChanges($from, $to)
     {
         // Loop over the to schema information and compare it to the from
+
         foreach ($to as $className => $info) {
             // If the from doesn't have this class then it is a new table
             if ( ! isset($from[$className])) {
@@ -293,6 +295,8 @@ class Doctrine_Migration_Diff
         $info = array();
         foreach ($models as $key => $model) {
             $table = Doctrine_Core::getTable($model);
+
+
             if ($table->getTableName() !== $this->_migration->getTableName()) {
                 $info[$model] = $table->getExportableFormat();
             }

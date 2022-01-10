@@ -3,14 +3,6 @@
 [?php if (!$sf_request->isXmlHttpRequest()): ?]
 [?php
 $return = url_for('<?php echo $this->getModuleName() ?>/index');
-if($sf_request->hasParameter('return'))
-{
-  $return = $sf_request->getParameter('return');
-}
-elseif($sf_request->getReferer() != '' && strpos($sf_request->getReferer(), $sf_request->getUri()) === false)
-{
-  $return = $sf_request->getReferer();
-}
 ?]
 <div class="lui_form_layer"><a href="[?php echo $return;?]" class="lui_form_layer__close anb"></a>
 [?php endif; ?]

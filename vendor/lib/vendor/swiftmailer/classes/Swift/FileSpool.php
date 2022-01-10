@@ -17,7 +17,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
 {
   /** The spool directory */
   private $_path;
-
+  
   /**
    * Create a new FileSpool.
    * @param string $path
@@ -25,7 +25,7 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
   public function __construct($path)
   {
     $this->_path = $path;
-
+    
     if (!file_exists($this->_path))
     {
       mkdir($this->_path, 0777, true);
@@ -65,8 +65,6 @@ class Swift_FileSpool extends Swift_ConfigurableSpool
     $ser = serialize($message);
     
     file_put_contents($this->_path.'/'.md5($ser.uniqid()).'.message', $ser);
-    file_put_contents($this->_path.'/'.md5($ser.uniqid()) . $message->getSubject() . '.html', $message->getBody());
-
   }
   
   /**

@@ -203,12 +203,10 @@ abstract class sfFormObject extends BaseForm
 
     foreach ($forms as $name => $form)
     {
-
       if (!isset($values[$name]) || !is_array($values[$name]))
       {
         continue;
       }
-
 
       if ($form instanceof sfFormObject)
       {
@@ -280,6 +278,6 @@ abstract class sfFormObject extends BaseForm
 
   protected function camelize($text)
   {
-    return preg_replace(array('#/(.?)#e', '/(^|_|-)+(.)/e'), array("'::'.strtoupper('\\1')", "strtoupper('\\2')"), $text);
+    return strtr(ucwords(strtr($text, array('/' => ':: ', '_' => ' ', '-' => ' '))), array(' ' => ''));
   }
 }

@@ -58,6 +58,7 @@ class sfValidatorDoctrineUnique extends sfValidatorSchema
     $this->addRequiredOption('column');
     $this->addOption('primary_key', null);
     $this->addOption('connection', null);
+    $this->addOption('skip_empty', null);
     $this->addOption('throw_global_error', false);
 
     $this->setMessage('invalid', 'Введенное значение занято');
@@ -127,6 +128,17 @@ class sfValidatorDoctrineUnique extends sfValidatorSchema
   protected function isUpdate(Doctrine_Record $object, $values)
   {
     // check each primary key column
+
+    if($this->getOption('skip_empty') === true){
+      foreach ($this->getOption('column') as $c){
+        if ($values[$c] === '' || $values[$c] === null)
+        {
+          return true;
+        }
+      }
+    }
+
+
     foreach ($this->getPrimaryKeys() as $column)
     {
       if (!isset($values[$column]) || $object->$column != $values[$column])

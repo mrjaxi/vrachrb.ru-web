@@ -76,7 +76,7 @@ class sfUser implements ArrayAccess
     $this->storage    = $storage;
 
     $this->options = array_merge(array(
-      'auto_shutdown'   => true,
+      'auto_shutdown'   => false,
       'culture'         => null,
       'default_culture' => 'en',
       'use_flash'       => false,

@@ -2,48 +2,44 @@
 
 <?php $path = sfConfig::get('sf_relative_url_root', preg_replace('#/[^/]+\.php5?$#', '', isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : (isset($_SERVER['ORIG_SCRIPT_NAME']) ? $_SERVER['ORIG_SCRIPT_NAME'] : ''))) ?>
 
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html style="height:100%" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="title" content="symfony project" />
-<meta name="robots" content="index, follow" />
-<meta name="description" content="symfony project" />
-<meta name="keywords" content="symfony, project" />
-<meta name="language" content="en" />
-<title>symfony project</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Ошибка <?php echo $code; ?></title>
 
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $path ?>/sf/sf_default/css/screen.css" />
-<!--[if lt IE 7.]>
-<link rel="stylesheet" type="text/css" media="screen" href="<?php echo $path ?>/sf/sf_default/css/ie.css" />
-<![endif]-->
+    <style type="text/css">
+        * {
+            font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            font-size: 14px;
+            line-height: 22px;
+        }
 
+        h1 {
+            font-weight: normal;
+            font-size: 32px;
+        }
+    </style>
 </head>
-<body>
-<div class="sfTContainer">
-  <a title="symfony website" href="http://www.symfony-project.org/"><img alt="symfony PHP Framework" class="sfTLogo" src="<?php echo $path ?>/sf/sf_default/images/sfTLogo.png" height="39" width="186" /></a>
-  <div class="sfTMessageContainer sfTAlert">
-    <img alt="page not found" class="sfTMessageIcon" src="<?php echo $path ?>/sf/sf_default/images/icons/tools48.png" height="48" width="48" />
-    <div class="sfTMessageWrap">
-      <h1>Oops! An Error Occurred</h1>
-      <h5>The server returned a "<?php echo $code ?> <?php echo $text ?>".</h5>
-    </div>
-  </div>
-
-  <dl class="sfTMessageInfo">
-    <dt>Something is broken</dt>
-    <dd>Please e-mail us at [email] and let us know what you were doing when this error occurred. We will fix it as soon as possible.
-    Sorry for any inconvenience caused.</dd>
-
-    <dt>What's next</dt>
-    <dd>
-      <ul class="sfTIconList">
-        <li class="sfTLinkMessage"><a href="javascript:history.go(-1)">Back to previous page</a></li>
-        <li class="sfTLinkMessage"><a href="/">Go to Homepage</a></li>
-      </ul>
-    </dd>
-  </dl>
-</div>
+<body style="height:100%;margin: 0;">
+<table width="100%" height="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td align="center" valign="middle">
+            <table cellpadding="20" cellspacing="0">
+                <tr>
+                    <td><img src="/i/sticker.png" height="200" width="200"/></td>
+                    <td>
+                        <h1>Ошибка <?php echo $code; ?></h1>
+                        <?php
+                        if ($code == 500) {
+                            echo 'Сервис временно недоступен.<br />Пожалуйста, попробуйте обновить страницу чуть позже.';
+                        }
+                        ?>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>

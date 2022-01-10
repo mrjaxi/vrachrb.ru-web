@@ -3,6 +3,6 @@ all:
     class: sfDoctrineDatabase
     profiler: false
     param:
-      dsn: 'mysql:host=127.0.0.1;dbname=vrachrb.ru'
-      username: vrachrb.ru
-      password: AIpFmmxMseRtthvCSs67
+      dsn: '<?php echo getenv('DB_DSN') ? getenv('DB_DSN') : 'mysql:host=mysql;dbname=vrachrb.ru';?>'
+      username: '<?php echo getenv('DB_USERNAME') ? getenv('DB_USERNAME') : 'root';?>'
+      password: '<?php echo getenv('DB_PASSWORD') ? getenv('DB_PASSWORD') : '';?>'

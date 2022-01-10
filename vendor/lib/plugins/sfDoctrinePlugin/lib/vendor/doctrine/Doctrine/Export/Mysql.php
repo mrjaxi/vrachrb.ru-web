@@ -62,7 +62,7 @@ class Doctrine_Export_Mysql extends Doctrine_Export
      */
     public function createDatabaseSql($name)
     {
-        echo 'CREATE DATABASE `' . $this->conn->quoteIdentifier($name, true) . '`';
+        //echo 'CREATE DATABASE `' . $this->conn->quoteIdentifier($name, true) . '`';
         return 'CREATE DATABASE `' . $this->conn->quoteIdentifier($name, true) . '`';
     }
 

@@ -10,17 +10,5 @@
 <span class="br30"></span>
 </div>
 </div>
-[?php
-$return = url_for('<?php echo $this->getModuleName() ?>/index');
-if($sf_request->hasParameter('return'))
-{
-  $return = $sf_request->getParameter('return');
-}
-elseif($sf_request->getReferer() != '' && strpos($sf_request->getReferer(), $sf_request->getUri()) === false)
-{
-  $return = $sf_request->getReferer();
-}
-?]
-<input type="hidden" name="return" value="[?php echo $return;?]" />
 </form>
 

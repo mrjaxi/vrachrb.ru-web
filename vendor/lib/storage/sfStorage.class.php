@@ -54,7 +54,7 @@ abstract class sfStorage
   public function initialize($options = array())
   {
     $this->options = array_merge(array(
-      'auto_shutdown' => true,
+      'auto_shutdown' => false,
     ), $options);
   }
 

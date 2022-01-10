@@ -103,10 +103,10 @@ abstract class Doctrine_Query_Abstract
      * @var array $_params  The parameters of this query.
      */
     protected $_params = array('exec' => array(),
-                               'join' => array(),
-                               'where' => array(),
-                               'set' => array(),
-                               'having' => array());
+        'join' => array(),
+        'where' => array(),
+        'set' => array(),
+        'having' => array());
 
     /**
      * @var array $_execParams The parameters passed to connection statement
@@ -138,6 +138,10 @@ abstract class Doctrine_Query_Abstract
     protected $_expireQueryCache = false;
     protected $_queryCacheTTL;
 
+    /**
+     * @var boolean $_autoFree  A boolean value that indicates whether or not use auto free.
+     */
+    protected $_autoFree = false;
 
     /**
      * @var Doctrine_Connection  The connection used by this query object.
@@ -153,36 +157,36 @@ abstract class Doctrine_Query_Abstract
      * @var array $_sqlParts  The SQL query string parts. Filled during the DQL parsing process.
      */
     protected $_sqlParts = array(
-            'select'    => array(),
-            'distinct'  => false,
-            'forUpdate' => false,
-            'from'      => array(),
-            'set'       => array(),
-            'join'      => array(),
-            'where'     => array(),
-            'groupby'   => array(),
-            'having'    => array(),
-            'orderby'   => array(),
-            'limit'     => false,
-            'offset'    => false,
-            );
+        'select'    => array(),
+        'distinct'  => false,
+        'forUpdate' => false,
+        'from'      => array(),
+        'set'       => array(),
+        'join'      => array(),
+        'where'     => array(),
+        'groupby'   => array(),
+        'having'    => array(),
+        'orderby'   => array(),
+        'limit'     => false,
+        'offset'    => false,
+    );
 
     /**
      * @var array $_dqlParts    an array containing all DQL query parts; @see Doctrine_Query::getDqlPart()
      */
     protected $_dqlParts = array(
-                            'from'      => array(),
-                            'select'    => array(),
-                            'forUpdate' => false,
-                            'set'       => array(),
-                            'join'      => array(),
-                            'where'     => array(),
-                            'groupby'   => array(),
-                            'having'    => array(),
-                            'orderby'   => array(),
-                            'limit'     => array(),
-                            'offset'    => array(),
-                            );
+        'from'      => array(),
+        'select'    => array(),
+        'forUpdate' => false,
+        'set'       => array(),
+        'join'      => array(),
+        'where'     => array(),
+        'groupby'   => array(),
+        'having'    => array(),
+        'orderby'   => array(),
+        'limit'     => array(),
+        'offset'    => array(),
+    );
 
 
     /**
@@ -205,13 +209,13 @@ abstract class Doctrine_Query_Abstract
      */
     protected $_queryComponents = array();
 
-	/**
+    /**
      * Stores the root DQL alias
      *
      * @var string
      */
     protected $_rootAlias = '';
-	
+
     /**
      * @var integer $type                   the query type
      *
@@ -264,13 +268,20 @@ abstract class Doctrine_Query_Abstract
     protected $_preQueried = false;
 
     /**
+     * Fix for http://www.doctrine-project.org/jira/browse/DC-701
+     *
+     * @var bool Boolean variable for whether the limitSubquery method of accessing tables via a many relationship should be used.
+     */
+    protected $disableLimitSubquery = false;
+
+    /**
      * Constructor.
      *
      * @param Doctrine_Connection  The connection object the query will use.
      * @param Doctrine_Hydrator_Abstract  The hydrator that will be used for generating result sets.
      */
     public function __construct(Doctrine_Connection $connection = null,
-            Doctrine_Hydrator_Abstract $hydrator = null)
+                                Doctrine_Hydrator_Abstract $hydrator = null)
     {
         if ($connection === null) {
             $connection = Doctrine_Manager::getInstance()->getCurrentConnection();
@@ -285,6 +296,7 @@ abstract class Doctrine_Query_Abstract
         $this->_tokenizer = new Doctrine_Query_Tokenizer();
         $this->_resultCacheTTL = $this->_conn->getAttribute(Doctrine_Core::ATTR_RESULT_CACHE_LIFESPAN);
         $this->_queryCacheTTL = $this->_conn->getAttribute(Doctrine_Core::ATTR_QUERY_CACHE_LIFESPAN);
+        $this->_autoFree = $this->_conn->getAttribute(Doctrine_Core::ATTR_AUTO_FREE_QUERY_OBJECTS);
     }
 
     /**
@@ -312,6 +324,18 @@ abstract class Doctrine_Query_Abstract
             throw new Doctrine_Query_Exception('Unknown option ' . $name);
         }
         $this->_options[$name] = $value;
+    }
+
+    /**
+     * Sets auto free
+     *
+     * @param boolean $value True or false (true by default)
+     */
+    public function setAutoFree($value = true)
+    {
+        $this->_autoFree = (boolean) $value;
+
+        return $this;
     }
 
     /**
@@ -502,7 +526,7 @@ abstract class Doctrine_Query_Abstract
     public function getFlattenedParams($params = array())
     {
         return array_merge(
-            (array) $params, (array) $this->_params['exec'], 
+            (array) $params, (array) $this->_params['exec'],
             $this->_params['join'], $this->_params['set'],
             $this->_params['where'], $this->_params['having']
         );
@@ -527,7 +551,7 @@ abstract class Doctrine_Query_Abstract
     {
         $this->_params = $params;
     }
-    
+
     /**
      * getCountQueryParams
      * Retrieves the parameters for count query
@@ -555,19 +579,19 @@ abstract class Doctrine_Query_Abstract
     public function fixArrayParameterValues($params = array())
     {
         $i = 0;
-	
+
         foreach ($params as $param) {
             if (is_array($param)) {
                 $c = count($param);
 
                 array_splice($params, $i, 1, $param);
-                
+
                 $i += $c;
             } else {
                 $i++;
             }
         }
-        
+
         $this->_execParams = $params;
     }
 
@@ -621,7 +645,7 @@ abstract class Doctrine_Query_Abstract
 
         // No inheritance map so lets just return
         if (empty($map)) {
-          return;
+            return;
         }
 
         $tableAlias = $this->getSqlTableAlias($componentAlias);
@@ -632,17 +656,17 @@ abstract class Doctrine_Query_Abstract
             $tableAlias .= '.';
         }
 
-        // Fix for 2015: loop through whole inheritanceMap to add all   
-        // keyFields for inheritance (and not only the first) 
-        $retVal = ""; 
-        $count = 0; 
-         
-        foreach ($map as $field => $value) { 
+        // Fix for 2015: loop through whole inheritanceMap to add all
+        // keyFields for inheritance (and not only the first)
+        $retVal = "";
+        $count = 0;
+
+        foreach ($map as $field => $value) {
             if ($count++ > 0) {
                 $retVal .= ' AND ';
             }
 
-            $identifier = $this->_conn->quoteIdentifier($tableAlias . $field); 
+            $identifier = $this->_conn->quoteIdentifier($tableAlias . $field);
             $retVal .= $identifier . ' = ' . $this->_conn->quote($value);
         }
 
@@ -777,7 +801,7 @@ abstract class Doctrine_Query_Abstract
         if ( ! $this->_queryComponents) {
             $this->getSqlQuery(array(), false);
         }
-        
+
         return $this->_rootAlias;
     }
 
@@ -896,11 +920,11 @@ abstract class Doctrine_Query_Abstract
      */
     public function getResultCacheHash($params = array())
     {
-      if ($this->_resultCacheHash) {
-          return $this->_resultCacheHash;
-      } else {
-          return $this->calculateResultCacheHash($params);
-      }
+        if ($this->_resultCacheHash) {
+            return $this->_resultCacheHash;
+        } else {
+            return $this->calculateResultCacheHash($params);
+        }
     }
 
     /**
@@ -931,13 +955,13 @@ abstract class Doctrine_Query_Abstract
                 if ($cached) {
                     // Rebuild query from cache
                     $query = $this->_constructQueryFromCache($cached);
-                    
+
                     // Assign building/execution specific params
                     $this->_params['exec'] = $params;
-            
+
                     // Initialize prepared parameters array
                     $this->_execParams = $this->getFlattenedParams();
-                    
+
                     // Fix possible array parameter values in SQL params
                     $this->fixArrayParameterValues($this->getInternalParams());
                 } else {
@@ -960,12 +984,12 @@ abstract class Doctrine_Query_Abstract
         } else {
             $query = $this->_view->getSelectSql();
         }
-        
+
         // Get prepared SQL params for execution
         $params = $this->getInternalParams();
 
         if ($this->isLimitSubqueryUsed() &&
-                $this->_conn->getAttribute(Doctrine_Core::ATTR_DRIVER_NAME) !== 'mysql') {
+            $this->_conn->getAttribute(Doctrine_Core::ATTR_DRIVER_NAME) !== 'mysql') {
             $params = array_merge((array) $params, (array) $params);
         }
 
@@ -1031,13 +1055,13 @@ abstract class Doctrine_Query_Abstract
                 $this->_hydrator->setQueryComponents($this->_queryComponents);
                 if ($this->_type == self::SELECT && $hydrationMode == Doctrine_Core::HYDRATE_ON_DEMAND) {
                     $hydrationDriver = $this->_hydrator->getHydratorDriver($hydrationMode, $this->_tableAliasMap);
-                    $result = new Doctrine_Collection_OnDemand($stmt, $hydrationDriver, $this->_tableAliasMap); 
+                    $result = new Doctrine_Collection_OnDemand($stmt, $hydrationDriver, $this->_tableAliasMap);
                 } else {
                     $result = $this->_hydrator->hydrateResultSet($stmt, $this->_tableAliasMap);
                 }
             }
         }
-        if ($this->getConnection()->getAttribute(Doctrine_Core::ATTR_AUTO_FREE_QUERY_OBJECTS)) {
+        if ($this->_autoFree) {
             $this->free();
         }
 
@@ -1048,7 +1072,7 @@ abstract class Doctrine_Query_Abstract
      * Blank template method free(). Override to be used to free query object memory
      */
     public function free()
-    { 
+    {
     }
 
     /**
@@ -1066,19 +1090,19 @@ abstract class Doctrine_Query_Abstract
                         'callback' => 'preDqlDelete',
                         'const' => Doctrine_Event::RECORD_DQL_DELETE
                     );
-                break;
+                    break;
                 case self::UPDATE:
                     $callback = array(
                         'callback' => 'preDqlUpdate',
                         'const' => Doctrine_Event::RECORD_DQL_UPDATE
                     );
-                break;
+                    break;
                 case self::SELECT:
                     $callback = array(
                         'callback' => 'preDqlSelect',
                         'const' => Doctrine_Event::RECORD_DQL_SELECT
                     );
-                break;
+                    break;
             }
         }
 
@@ -1111,8 +1135,8 @@ abstract class Doctrine_Query_Abstract
                 $params = array('component' => $component, 'alias' => $alias);
                 $event = new Doctrine_Event($record, $callback['const'], $this, $params);
 
-                $record->$callback['callback']($event);
-                $table->getRecordListener()->$callback['callback']($event);
+                $record->{$callback['callback']}($event);
+                $table->getRecordListener()->{$callback['callback']}($event);
             }
         }
 
@@ -1142,7 +1166,7 @@ abstract class Doctrine_Query_Abstract
         $copy->free();
 
         if ($componentsBefore !== $componentsAfter) {
-            return array_diff($componentsAfter, $componentsBefore);
+            return Doctrine_Lib::arrayDiffSimple($componentsAfter, $componentsBefore);
         } else {
             return $componentsAfter;
         }
@@ -1176,9 +1200,9 @@ abstract class Doctrine_Query_Abstract
         foreach ($cachedComponents as $alias => $components) {
             $e = explode('.', $components['name']);
             if (count($e) === 1) {
-                $manager = Doctrine_Manager::getInstance(); 
-                if ( ! $this->_passedConn && $manager->hasConnectionForComponent($e[0])) { 
-                    $this->_conn = $manager->getConnectionForComponent($e[0]); 
+                $manager = Doctrine_Manager::getInstance();
+                if ( ! $this->_passedConn && $manager->hasConnectionForComponent($e[0])) {
+                    $this->_conn = $manager->getConnectionForComponent($e[0]);
                 }
                 $queryComponents[$alias]['table'] = $this->_conn->getTable($e[0]);
             } else {
@@ -1484,7 +1508,7 @@ abstract class Doctrine_Query_Abstract
     /**
      * Adds conditions to the HAVING part of the query.
      *
-     * This methods add HAVING clauses. These clauses are used to narrow the 
+     * This methods add HAVING clauses. These clauses are used to narrow the
      * results by operating on aggregated values.
      * <code>
      * $q->having('num_phonenumbers > ?', 1);
@@ -1771,19 +1795,19 @@ abstract class Doctrine_Query_Abstract
     protected function clear()
     {
         $this->_sqlParts = array(
-                    'select'    => array(),
-                    'distinct'  => false,
-                    'forUpdate' => false,
-                    'from'      => array(),
-                    'set'       => array(),
-                    'join'      => array(),
-                    'where'     => array(),
-                    'groupby'   => array(),
-                    'having'    => array(),
-                    'orderby'   => array(),
-                    'limit'     => false,
-                    'offset'    => false,
-                    );
+            'select'    => array(),
+            'distinct'  => false,
+            'forUpdate' => false,
+            'from'      => array(),
+            'set'       => array(),
+            'join'      => array(),
+            'where'     => array(),
+            'groupby'   => array(),
+            'having'    => array(),
+            'orderby'   => array(),
+            'limit'     => false,
+            'offset'    => false,
+        );
     }
 
     public function setHydrationMode($hydrationMode)
@@ -2139,5 +2163,26 @@ abstract class Doctrine_Query_Abstract
     public function __toString()
     {
         return $this->getDql();
+    }
+
+    /**
+     * Gets the disableLimitSubquery property.
+     *
+     * @return boolean
+     */
+    public function getDisableLimitSubquery()
+    {
+        return $this->disableLimitSubquery;
+    }
+
+    /**
+     * Allows you to set the disableLimitSubquery property -- setting this to true will
+     * restrict the query object from using the limit sub query method of tranversing many relationships.
+     *
+     * @param boolean $disableLimitSubquery
+     */
+    public function setDisableLimitSubquery($disableLimitSubquery)
+    {
+        $this->disableLimitSubquery = $disableLimitSubquery;
     }
 }

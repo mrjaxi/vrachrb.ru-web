@@ -73,7 +73,6 @@ class Doctrine_Migration
 
         if ($directory != null) {
             $this->_migrationClassesDirectory = $directory;
-
             $this->loadMigrationClassesFromDirectory();
         }
     }

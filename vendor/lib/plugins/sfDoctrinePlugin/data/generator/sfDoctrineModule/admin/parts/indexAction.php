@@ -103,7 +103,7 @@
               throw $e;
             }
 
-            $value = ob_get_clean();
+            $value = strip_tags(ob_get_clean());
             
             
 <?php

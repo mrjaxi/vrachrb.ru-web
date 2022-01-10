@@ -1,0 +1,41 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Partner
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          partner
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 90
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        title: {label: Название}
+        logo: {label: 'Логотип'}
+        body: {label: 'Описание'}
+        link: {label: 'Ссылка'}
+        order_field: {label: 'Порядок сортировки'}
+      list:
+        layout: ~
+        title: 'Партнёры'
+        display: [title, _logo, order_field]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title, body, link]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование партнёра
+      new:
+        title: Добавление партнёра

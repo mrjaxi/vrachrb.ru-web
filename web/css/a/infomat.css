@@ -1,0 +1,187 @@
+.a_infomat__{
+  padding: 10px 0 10px 10px;
+
+}
+
+
+.a_infomat__item{
+  display: inline-block;
+  width: 240px;
+  vertical-align: top;
+  margin: 0 10px 10px 0;
+  padding: 15px;
+  border: 1px solid #e4e4e4;
+  border-radius: 5px;
+  position: relative;
+}
+.a_infomat__item_state_1{
+  background-color: #ebfae6;
+  border-color: #ebfae6;
+}
+.a_infomat__item_state_2{
+  background-color: #e4e4e4;
+  border-color: #e4e4e4;
+}
+.a_infomat__item_state_3{
+  background-color: #ffe6e6;
+  border-color: #ffe6e6;
+}
+.a_infomat__item__edit{
+  cursor: pointer;
+  opacity: 0.7;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+.a_infomat__item__edit:hover{
+  opacity: 1;
+}
+.a_infomat__item__serial{
+  color: #999999;
+  font-size: 14px;
+}
+.a_infomat__item__device{
+  background-color: #666666;
+  padding: 5px 5px 5px 5px;
+  border-radius: 5px;
+}
+.a_infomat__item__device_display{
+  background-color: #333333;
+  display: inline-block;
+  width: 100%;
+  height: 56%;
+  border-radius: 5px;
+  background-size: cover;
+}
+.a_infomat__item_state_1 .a_infomat__item_state_text{
+  color: #0C0;
+}
+.a_infomat__item_state_3 .a_infomat__item_state_text{
+  color: #F30;
+}
+.a_infomat__item_state_1 .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/home.png);
+}
+.a_infomat__item_state_2 .a_infomat__item__device_display{
+  background-color: #fff !important;
+}
+.a_infomat__item_state_3 .a_infomat__item__device_display{
+  
+}
+.a_infomat__item .lui__pirelli_button{
+  color: #aaa;
+  border-color: #aaa;
+  
+}
+.a_infomat__item .lui__pirelli_button:hover{
+  background-color: #6dc75e;
+  border-color: #6dc75e;
+  color: #fff;
+}
+.lui__pirelli_button_3:hover{
+  background-color: #F30 !important;
+  border-color: #F30 !important;
+}
+.infomat_tag_selector{
+  font-style: normal;
+  display: inline-block;
+  cursor: pointer;
+  padding: 3px 6px 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  vertical-align: bottom;
+}
+
+.infomat_tag_selector:hover{
+  border-color: #8b8b8b;
+  color: #8b8b8b;
+}
+.infomat_tag_selector span{
+  color: #be006d;
+  border-bottom: 1px dashed #be006d;
+}
+.infomat_tag_selector:hover span{
+  border-color: transparent;
+  color: #8b8b8b;
+}
+.infomat_tag_selector__current{
+  background: #22292b !important;
+  color: #fff !important;
+  border-color: #22292b !important;
+}
+.infomat_tag_selector__current span{
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+
+
+
+
+
+
+
+
+.a_infomat__item_path__manual .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/manual.png);
+}
+.a_infomat__item_path__courses .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/courses.png);
+}
+.a_infomat__item_path__review .a_infomat__item__device_display,
+.a_infomat__item_path__danger .a_infomat__item__device_display,
+.a_infomat__item_path__appeal .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/feedback.png);
+}
+.a_infomat__item_path__news .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/news.png);
+}
+.a_infomat__item_path__siz .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/siz.png);
+}
+.a_infomat__item_path__checkup .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/checkup.png);
+}
+.a_infomat__item_path__info .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/info.png);
+}
+.a_infomat__item_path__public_timetable .a_infomat__item__device_display,
+.a_infomat__item_path__private_timetable .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/schedule.png);
+}
+.a_infomat__item_path__benchmark .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/test.png);
+}
+.a_infomat__item_path__hse .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/hse.png);
+}
+.a_infomat__item_path__profile .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/profile.png);
+}
+.a_infomat__item_path__hype .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/adv.png);
+}
+.a_infomat__item_path__warn .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/alert.png);
+}
+.a_infomat__item_path__bsod .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/bsod.png);
+}
+.a_infomat__item_path__ofline .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/disconnect.png);
+}
+.a_infomat__item_path__preloader .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/loading.png);
+}
+.a_infomat__item_path__off .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/offlane.png);
+}
+.a_infomat__item_path__signin .a_infomat__item__device_display{
+  background-image: url(/i/a/infomat/login.png);
+}
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Specialist_work_place
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          specialist_work_place
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 61
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        specialist_id: {label: 'Специалист'}
+        specialist: {label: 'Специалист'}
+        title: {label: Название}
+        hidden: {label: 'Скрыто'}
+      list:
+        layout: ~
+        title: 'Место работы специалистов'
+        display: [_specialist, title, hidden]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title, u.first_name, u.second_name, u.middle_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование места работы
+      new:
+        title: Добавление места работы

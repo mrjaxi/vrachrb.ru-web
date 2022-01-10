@@ -1,0 +1,7 @@
+default:
+  http_metas:
+    content-type: text/html
+  stylesheets: [arm/g.css, a/lui.css?u=13022017, chosen.css, arm/jquery.treetable.css, arm/jquery.treetable.theme.default.css, arm/theme.default.css, /js/arm/redactor/css/redactor.css, arm/addon.css, jquery.Jcrop.css]
+  javascripts: [jquery-1.10.2.min.js, jquery-migrate-1.2.1.min.js, arm/plugins.js, arm/perfect-scrollbar.min.js, chosen.jquery.js, arm/jquery.autocomplete.js, arm/selectize.min.js, arm/jquery.hideseek.js, arm/jquery.stickytableheaders.min.js, arm/redactor/redactor.js, jquery.liteuploader.js, sexypicker.js, atmaUI.js, arm/arm.js, arm/jquery-ui.js, arm/init.d.js, arm/addon.js]
+  has_layout: true
+  layout: layout

@@ -1,0 +1,408 @@
+homepage:
+  url: /
+  param: { module: main, action: index }
+
+lp_auth:
+  url: /lp-auth/
+  param: { module: user, action: lpAuth }
+
+signin:
+  url: /signin/
+  param: { module: user, action: signin }
+
+user_active:
+  url: /user/active/:password_check/:username/
+  param: { module: user, action: activate }
+
+signin_check:
+  url: /signin-check/
+  param: { module: user, action: signin_check }
+
+ckeck_token:
+  url: /check_token/
+  param: { module: user, action: check_token }
+
+signout:
+  url: /signout/
+  param: { module: user, action: signout }
+
+login_index:
+  url: /login/
+  param: { module: user, action: login }
+
+login_true:
+  url: /login/:authorization
+  param: { module: user, action: login }
+  requirements: { authorization: 1 }
+
+notice_update:
+  url: /notice-update/
+  param: { module: main, action: notice_update }
+
+register:
+  url: /register/
+  param: { module: user, action: register }
+
+change_index:
+  url: /change/
+  param: { module: user, action: change }
+
+change_password_index:
+  url: /change_password/
+  param: { module: user, action: change_password }
+
+message_error_add:
+  url: /message-error-add/
+  param: { module: main, action: message_error_add }
+
+agreement_index:
+  url: /agreement/
+  param: { module: agreement, action: index }
+
+agreement_show:
+  url: /agreement/:id/
+  param: { module: agreement, action: show }
+  requirements:
+    id: \d+
+
+yam:
+  url: /yam/
+  param: { module: main, action: yam }
+
+question_answer_index:
+  url: /question-answer/
+  param: { module: question_answer, action: index }
+
+question_answer_show:
+  url: /question-answer/:id/
+  param: { module: question_answer, action: show }
+  requirements:
+    id: \d+
+
+question_answer_filter:
+  url: /question-answer-filter/
+  param: { module: question_answer, action: filter }
+
+question_answer_page:
+  url: /question-answer/page/:id/
+  param: { module: question_answer, action: qa_page }
+  requirements:
+    id: \d+
+
+ask_question:
+  url: /ask-question/
+  param: { module: ask_question, action: index }
+
+ask_question_complete:
+  url: /ask-question/complete/
+  param: { module: ask_question, action: complete }
+
+ask_question_tip:
+  url: /ask-question/search-tip/
+  param: { module: ask_question, action: tip }
+
+sheet_history_update:
+  url: /sheet-history-update/
+  param: { module: ask_question, action: sheet_history_update }
+
+ask_question_select_specialist:
+  url: /ask-question/:id/
+  param: { module: ask_question, action: select_specialist }
+  requirements:
+    id: \d+
+
+ask_question_specialist_filter:
+  url: /ask-question/specialist-filter/
+  param: { module: ask_question, action: specialist_filter }
+
+specialist_index:
+  url: /specialist/
+  param: { module: specialist, action: index }
+
+specialist_show:
+  url: /specialist/:title_url/
+  param: { module: specialist, action: show }
+
+specialist_filter:
+  url: /specialist_filter/
+  param: { module: specialist, action: filter }
+
+tip_index:
+  url: /tip/
+  param: { module: tip, action: index }
+
+tip_show:
+  url: /tip/:title_url/
+  param: { module: tip, action: show }
+
+tip_page:
+  url: /tip/page/:id/
+  param: { module: tip, action: tip_page }
+  requirements:
+    id: \d+
+
+specialty_filter:
+  url: /specialty_filter/
+  param: { module: tip, action: filter }
+
+categories_index:
+  url: /categories/
+  param: { module: categories, action: index }
+
+categories_transition_filter:
+  url: /categories/specialty/:id/
+  param: { module: categories, action: transition_filter }
+  requirements:
+    id: \d+
+
+categories_filter:
+  url: /categories_filter/
+  param: { module: categories, action: filter }
+
+categories_more:
+  url: /categories/more/
+  param: { module: categories, action: more }
+
+article_index:
+  url: /article/
+  param: { module: article, action: index }
+
+article_show:
+  url: /article/:title_url/
+  param: { module: article, action: show }
+
+article_page:
+  url: /article/page/:id/
+  param: { module: article, action: article_page }
+  requirements:
+    id: \d+
+
+news_index:
+  url: /news/
+  param: { module: news, action: index }
+
+news_show:
+  url: /news/:title_url/
+  param: { module: news, action: show }
+
+news_page:
+  url: /news/page/:id/
+  param: { module: news, action: news_page }
+  requirements:
+    id: \d+
+
+partner_index:
+  url: /partner/
+  param: { module: partner, action: index }
+
+documentation_index:
+  url: /documentation/
+  param: { module: documentation, action: index }
+
+documentation_dl:
+  url: /documentation/:id/*
+  param: { module: documentation, action: dl }
+  requirements:
+    id: \d+
+
+help:
+  url: /help/
+  param: { module: page, action: help }
+
+about:
+  url: /about/
+  param: { module: page, action: about }
+
+donate:
+  url: /donate/
+  param: { module: page, action: donate }
+
+donate_sponsor:
+  url: /donate/sponsor/
+  param: { module: page, action: sponsor }
+
+photo:
+  url: /photo/
+  param: { module: main, action: photo }
+
+personal_account_index:
+  url: /personal-account/
+  param: { module: personal_account, action: index }
+
+personal_filter_view:
+  url: /personal-account/filter/
+  param: { module: personal_account, action: filter_view }
+
+personal_account_now_dialog_show:
+  url: /personal-account/now-dialog/:id/
+  param: { module: personal_account, action: now_dialog_show }
+  requirements:
+    id: \d+
+
+personal_account_now_dialog_answer:
+  url: /personal-account/now-dialog-answer/
+  param: { module: personal_account, action: now_dialog_answer }
+
+personal_account_patient_card:
+  url: /personal-account/patient-card/
+  param: { module: personal_account, action: patient_card}
+
+personal_account_data:
+  url: /personal-account/data/
+  param: { module: personal_account, action: data }
+
+personal_account_feedback:
+  url: /personal-account/feedback/
+  param: { module: personal_account, action: feedback }
+
+account_history_test:
+  url: /account/history-test/:user_id/
+  param: { module: main, action: history_test }
+  requirements:
+    user_id: \d+
+
+account_history_test_show:
+  url: /account/history-test/:user_id/:id/
+  param: { module: main, action: history_test_show }
+  requirements:
+    user_id: \d+
+    id: \d+
+
+search:
+  url: /search/
+  param: { module: search, action: index }
+
+doctor_account_index:
+  url: /doctor-account/
+  param: { module: doctor_account, action: index }
+
+doctor_filter_view:
+  url: /doctor-account/filter/
+  param: { module: doctor_account, action: filter_view }
+
+doctor_account_sheet_history:
+  url: /doctor-account/sheet-history/
+  param: { module: doctor_account, action: sheet_history }
+
+doctor_account_patient_card:
+  url: /doctor-account/patient-card/:id/
+  param: { module: doctor_account, action: patient_card }
+  requirements:
+    id: \d+
+
+doctor_account_patient_card_show:
+  url: /doctor-account/patient-card/show/:id/
+  param: { module: doctor_account, action: patient_card_show }
+  requirements:
+    id: \d+
+
+doctor_account_now_dialog_answer:
+  url: /doctor-account/now-dialog-answer/
+  param: { module: doctor_account, action: now_dialog_answer }
+
+doctor_account_now_dialog_edit:
+  url: /doctor-account/now-dialog-edit/
+  param: { module: doctor_account, action: now_dialog_edit }
+
+doctor_account_now_dialog_show:
+  url: /doctor-account/now-dialog/:id/
+  param: { module: doctor_account, action: now_dialog_show }
+  requirements:
+    id: \d+
+
+doctor_account_consilium:
+  url: /doctor-account/consilium/
+  param: { module: doctor_account, action: consilium }
+
+doctor_account_consilium_show:
+  url: /doctor-account/consilium/:id/
+  param: { module: doctor_account, action: consilium_show }
+  requirements:
+    id: \d+
+
+doctor_account_consilium_answer:
+  url: /doctor-account/consilium-answer/
+  param: { module: doctor_account, action: consilium_answer }
+
+doctor_account_consilium_close:
+  url: /doctor-account/consilium-close/
+  param: { module: doctor_account, action: consilium_close }
+
+doctor_account_history_appeal:
+  url: /doctor-account/history-appeal/
+  param: { module: doctor_account, action: history_appeal }
+
+doctor_account_history_appeal_filter:
+  url: /doctor-account/ha-filter/
+  param: { module: doctor_account, action: ha_filter }
+
+doctor_account_data:
+  url: /doctor-account/data/
+  param: { module: doctor_account, action: data }
+
+doctor_account_posting:
+  url: /doctor-account/posting/
+  param: { module: doctor_account, action: posting }
+
+doctor_account_posting_page:
+  url: /doctor-account/posting/:id/
+  param: { module: doctor_account, action: posting }
+  requirements:
+    id: \d+
+
+doctor_account_posting_article:
+  url: /doctor-account/posting-article/
+  param: { module: doctor_account, action: posting_article }
+
+vk_callback:
+  url: /vk-callback/
+  param: { module: vk_callback, action: index }
+
+uploader:
+  url: /uploader
+  param: { module: main, action: uploader }
+
+#print:
+#  url: /print/:template/
+#  param: { module: print, action: show }
+#  requirements: { template: test|direction_test }
+
+comment:
+  url: /comment/
+  param: { module: main, action: comment }
+
+sitemap:
+  url: /sitemap.xml
+  param: { module: page, action: sitemap }
+
+robots:
+  url: /robots.txt
+  param: { module: page, action: robots }
+
+mobile_live_ribbon:
+  url: /mobile/live-ribbon/
+  param: { module: mobile, action: live_ribbon }
+
+mobile_article:
+  url: /mobile/article/
+  param: { module: mobile, action: article }
+
+comment_restart:
+  url: /comment-restart/
+  param: { module: main, action: comment_restart }
+
+frame_index:
+  url: /frame/
+  param: { module: frame, action: index }
+
+recover_password:
+  url: /recover-password/
+  param: { module: user, action: recover_password }
+
+recover_password_active:
+  url: /recover-password/active/:email_sha/:password_check/
+  param: { module: user, action: recover_password_active }
+
+live_band_update:
+  url: /live-band-update/
+  param: { module: main, action: live_band_update }

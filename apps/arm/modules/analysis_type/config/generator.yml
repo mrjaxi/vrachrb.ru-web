@@ -1,0 +1,39 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Analysis_type
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          analysis_type
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 29
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        title: {label: Название}
+        description: {label: Описание}
+      list:
+        layout: ~
+        title: 'Виды анализов'
+        display: [title, description]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title, description]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование 
+      new:
+        title: Добавление 

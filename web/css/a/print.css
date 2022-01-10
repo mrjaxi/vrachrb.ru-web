@@ -1,0 +1,30 @@
+body{margin:0;font:14pt Arial;}
+*{color:#000000;font-size:14pt;font-family:Arial;}
+.br3,.br5,.br10,.br15,.br14,.br1,.br20,.br25,.br30,.br40,.br50{height:5px;overflow:hidden;display:block;clear:both;}
+.br50{height:50px;}
+.br40{height:40px;}
+.br30{height:30px;}
+.br25{height:25px;}
+.br20{height:20px;}
+.br15{height:15px;}
+.br14{height:14px;}
+.br10{height:10px;}
+.br3{height:3px;}
+.br1{height:1px;}
+.hr{height:1px;font-size:0;border-bottom:1px solid #eeeeee;}
+input,select,textarea{
+  border: none;
+}
+.managed_add,.managed_edit,.managed_remove,.lui__h1,.lui__desktop_left,.sf_admin_actions{
+  display: none;
+}
+fieldset{
+  border: none;
+  padding: 15px 0;
+}
+.sf_admin_form_row{
+  margin-bottom: 15px;
+}
+{
+  display: none;
+}

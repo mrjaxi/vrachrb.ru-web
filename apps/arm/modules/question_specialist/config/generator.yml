@@ -1,0 +1,38 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Question_specialist
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          question_specialist
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    skip: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        question_id: {label: 'Вопрос'}
+        specialist_id: {label: 'Специалист'}
+      list:
+        layout: ~
+        title: 'Вопрос-специалист'
+        display: ~
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование 
+      new:
+        title: Добавление 

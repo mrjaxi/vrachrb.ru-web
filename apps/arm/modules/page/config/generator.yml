@@ -1,0 +1,43 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Page
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          page
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 1000
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        title: {label: Название}
+        folder: {label: 'Страница'}
+        body: {label: 'Текст страницы'}
+        is_activated: {label: Опубликован}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Страницы'
+        display: [title, folder, is_activated, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование 
+      new:
+        title: Добавление 

@@ -1,0 +1,39 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Specialist_online
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          specialist_online
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    skip: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        specialist_id: {label: 'Специалист'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Специалисты в сети'
+        display: ~
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование записи
+      new:
+        title: Добавление записи

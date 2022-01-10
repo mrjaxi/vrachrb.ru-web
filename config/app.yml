@@ -1,0 +1,276 @@
+all:
+  lp:
+    host: 'vrachrb.ru'
+  protocol: 'http'
+  prod: true
+  question_quick_open: true
+  add_user: 1500
+  push_url: 'http://app.vrachrb.ru'
+  push_key: 'AIzaSyAH6s5pww9ScbCW9ZaRM9BeDoxkKg-7Wts'
+  vk:
+    publish: true
+    notice: false
+    time_difference: 60
+    group_id: 98747038
+    client_id: 5367670
+    client_secret: jryleKXkh3BNYQBqfhpH
+    access_token: 8d12a493de99d460b0bb20cbdadda8eb5a52e2b247fd5d64c1103705facd2e6a4e82e3fad6e9d8fa93773
+    access_token_user: a4515654edf391e24c7033a99aaad705c67824964895eb53759253ac1e1bcc447c23ada945f4122ffefbc
+    # access_token_user: efff9bdb478d5a25c3cff78b20458b03a163d1baf0acef2874ca920206b0e5f4f78f20752561d63a3445a
+    callback_secret: klnkjabf156abshfvvzaopirasdvcd12
+  waiting_time_online: 300
+  waiting_time_patient_card: 86400
+  email_sender: 'mur@atmapro.ru'
+  www_title: 'Врач РБ онлайн - Сервис медицинской консультации'
+  default_culture: ru_RU
+  i18n: true
+  doAuth:
+    algorithm_callable: sha1
+    check_password_callable: false
+    remember_cookie_name: doRemember
+    remember_cookie_expiration_age: 31536000
+    activation: true
+    reset_password_url: '@homepage'
+    signin_url: '@homepage'
+    signout_url: '@homepage'
+    routes_register: true
+  doAuth_register:
+    forward: ~
+    redirect_path: '@homepage'
+    signin: true
+  doAuth_email:
+    activation: true
+    registration: true
+    module: false
+  sf_captchagd:
+    image_width: 150
+    image_height: 45
+    chars: "123456789"
+    length: 5
+    font_size: 18
+    force_new_captcha: true
+    font_color: ["ACACAC"]
+    fonts: ["planet_benson/Planetbe.ttf"]
+    background_color: FFFFFF
+    border_color: FFFFFF
+  redactor:
+    sizes:
+      min:
+        width: 100
+        height: 100
+      S:
+        width: 200
+        height: 200
+        thumbstyle: center
+        watermark: false
+      M:
+        width: 700
+        height: 400
+        thumbstyle: center
+        watermark: false
+  page:
+    sizes:
+      min:
+        width: 10
+        height: 10
+      S:
+        width: 300
+        height: 10000
+        thumbstyle: scale
+        watermark: false
+      M:
+        width: 935
+        height: 100000
+        thumbstyle: scale
+        watermark: false
+  user:
+    sizes:
+      min:
+        width: 230
+        height: 230
+      S:
+        width: 110
+        height: 110
+        thumbstyle: top
+      M:
+        width: 230
+        height: 230
+        thumbstyle: center
+  review_advanced:
+    sizes:
+      min:
+        width: 600
+        height: 600
+      M:
+        width: 1200
+        height: 1200
+        thumbstyle: scale
+  partner:
+    sizes:
+      S:
+        width: 250
+        height: 85
+        thumbstyle: scale
+  certificate:
+    sizes:
+      min:
+        width: 200
+        height: 200
+      S:
+        width: 100000
+        height: 180
+        thumbstyle: scale
+      M:
+        width: 1200
+        height: 1200
+        thumbstyle: scale
+        watermark: true
+  article:
+    sizes:
+      min:
+        width: 700
+        height: 400
+      S:
+        width: 330
+        height: 220
+        thumbstyle: center
+      M:
+        width: 700
+        height: 400
+        thumbstyle: center
+  prompt:
+    sizes:
+      min:
+        width: 700
+        height: 400
+      S:
+        width: 275
+        height: 235
+        thumbstyle: center
+      M:
+        width: 700
+        height: 400
+        thumbstyle: center
+  news:
+    sizes:
+      min:
+        width: 700
+        height: 400
+      S:
+        width: 165
+        height: 100
+        thumbstyle: center
+      M:
+        width: 700
+        height: 400
+        thumbstyle: center
+  video:
+    sizes:
+      min:
+        width: 270
+        height: 140
+      S:
+        width: 270
+        height: 140
+        thumbstyle: center
+  banner:
+    sizes:
+      min:
+        width: 80
+        height: 100
+      S:
+        width: 80
+        height: 100
+        thumbstyle: center
+  advertising:
+    sizes:
+      min:
+        width: 260
+        height: 140
+      S:
+        width: 260
+        height: 140
+        thumbstyle: center
+  analysis:
+    sizes:
+      min:
+        width: 100
+        height: 100
+      S:
+        width: 420
+        height: 240
+        thumbstyle: scale
+      M:
+        width: 1200
+        height: 1200
+        thumbstyle: scale
+  attachment:
+    sizes:
+      min:
+        width: 100
+        height: 100
+      S:
+        width: 100
+        height: 100
+        thumbstyle: center
+      M:
+        width: 1200
+        height: 1200
+        thumbstyle: scale        
+  message_error:
+    sizes:
+      min:
+        width: 100
+        height: 100
+      S:
+        width: 800
+        height: 800
+        thumbstyle: scale
+  search:
+    objects:
+      1:
+        cat: 'Вопросы'
+        module: question_answer
+        model: Question
+        content: [body]
+        title: [body]
+      2:
+        cat: 'Специалисты'
+        module: specialist
+        model: Specialist
+        leftJoin: ['a.User u']
+        title_methods:
+          1: [getUser, getSecondName]
+          2: [getUser, getFirstName]
+          3: [getUser, getMiddleName]
+        content_methods:
+          1: [getAbout]
+          2: [getEducation]
+        key: title_url
+      3:
+         cat: 'Советы'
+         module: tip
+         model: Prompt
+         content: [body]
+         title: [title]
+         key: title_url
+      4:
+        cat: 'Статьи'
+        module: article
+        model: Article
+        content: [body]
+        title: [title]
+        key: title_url
+      5:
+        cat: 'Новости'
+        module: news
+        model: News
+        content: [body]
+        title: [title]
+        key: title_url
+      6:
+        cat: 'Партнёры'
+        global_link: partner_index
+        model: Partner
+        content: [body]
+        title: [title]

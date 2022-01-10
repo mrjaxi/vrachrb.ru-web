@@ -1,0 +1,44 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Analysis
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          analysis
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 28
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        answer_id: {label: '№ ответа'}
+        user_id: {label: 'Пользователь'}
+        user: {label: 'Пользователь'}
+        analysis_type_id: {label: 'Анализ'}
+        analysis_type: {label: 'Анализ'}
+        photo: {label: 'Фотография'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Анализы'
+        display: [_user, _analysis_type, _photo]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [u.first_name, u.second_name, u.middle_name, at.title]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование анализа
+      new:
+        title: Добавление анализа

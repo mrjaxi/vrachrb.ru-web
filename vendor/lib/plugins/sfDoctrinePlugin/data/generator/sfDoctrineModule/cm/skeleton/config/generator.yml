@@ -1,0 +1,27 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+##CONFIG##
+
+    config:
+      actions: ~
+      fields:
+##FIELDS##
+      list:
+        layout: ~
+        title: 'Новый модуль'
+        display: ~
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование 
+      new:
+        title: Добавление 

@@ -1,0 +1,22 @@
+html{color:#000;background-color:#fff;}
+body{margin:0;padding:5px;}
+body,dl,dt,dd,ul,ol,li,fieldset,legend,select,input,button,textarea,p,blockquote,th,td{font:11pt Times;}
+img{border:0;}
+li{}
+table{border-collapse:collapse;}
+td,th{padding:5px;}
+caption,th{text-align:left;}
+h1,h2,h3,h4,h5,h6{font-weight:normal;}
+a{color:#0090aa;font:11pt Times;}
+a:hover{text-decoration:none;}
+hr{border:none;border-top:1px solid #ccc;height:0;font-size:0;}
+h1{font-size:22pt;}
+h2{font-size:20pt;}
+h3{font-size:12pt;}
+h4,h4 *{font-size:14pt;}
+.f-left{float:left !important;}
+.f-right{float:right !important;}
+.xxs{font-size:8pt;color:#fff;}
+sup{font-size:8pt;position:absolute;margin-left:5px;margin-top:1px;}
+.xs{font-size:5px;}
+p{margin:0 0 10px 0;padding:0;}

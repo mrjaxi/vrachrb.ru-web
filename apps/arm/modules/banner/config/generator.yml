@@ -1,0 +1,41 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Banner
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          banner
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 105
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        title: {label: Название}
+        link: {label: 'Ссылка'}
+        photo: {label: 'Фотография (80px*100px)'}
+        is_activated: {label: Показать в подвале сайта}
+        order_field: {label: Порядок сортировки}
+      list:
+        layout: ~
+        title: 'Баннеры'
+        display: [title, _photo, is_activated, order_field]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование баннера
+      new:
+        title: Добавление баннера

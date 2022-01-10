@@ -1,0 +1,47 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Prompt
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          prompt
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 40
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        specialist_id: {label: 'Cпециалист'}
+        specialty_id: {label: 'Специальность'}
+        title: {label: Название}
+        specialist: {label: 'Специалист'}
+        photo: {label: 'Фотография'}
+        description: {label: 'Краткое описание'}
+        body: {label: 'Текст совета'}
+        video: {label: 'Код видео с youtube.com'}
+        created_at: {label: 'Дата создания'}
+        created: {label: 'Дата создания'}
+      list:
+        layout: ~
+        title: 'Советы'
+        display: [title, _specialist, _photo, _created]
+        sort: [created_at, desc]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title, u.second_name, u.first_name, u.middle_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование совета
+      new:
+        title: Добавление совета

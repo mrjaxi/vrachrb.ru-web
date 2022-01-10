@@ -1,0 +1,41 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Advertising
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          advertising
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 110
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        title: {label: 'Название'}
+        link: {label: 'Ссылка'}
+        photo: {label: 'Фотография'}
+        is_activated: {label: 'Опубликован'}
+      list:
+        layout: ~
+        title: 'Реклама'
+        display: [title, link, _photo]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование рекламы
+      new:
+        title: Добавление рекламы

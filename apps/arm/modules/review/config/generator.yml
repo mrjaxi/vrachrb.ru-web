@@ -1,0 +1,49 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Review
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          review
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 80
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        question_id: {label: 'Вопрос'}
+        question: {label: 'Вопрос'}
+        user_id: {label: 'Пользователь'}
+        username: {label: 'Пользователь'}
+        specialist_name: {label: 'Специалист'}
+        specialist_id: {label: 'Специалист'}
+        body: {label: 'Текст отзыва'}
+        informative: {label: 'Оценка информативности (0-5)'}
+        courtesy: {label: 'Оценка вежливости (0-5)'}
+        approved: {label: 'Одобрено'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Отзывы'
+        display: [_question, _specialist_name, body, approved, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [r.body, u.second_name, u.first_name, q.body]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование отзыва
+      new:
+        title: Добавление отзыва

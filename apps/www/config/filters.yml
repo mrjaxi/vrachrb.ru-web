@@ -1,0 +1,12 @@
+seo:
+  class: seoFilter
+frame:
+  class: frameFilter
+agreement:
+  class: agreementFilter
+rendering: ~
+security:  ~
+remember_me:
+  class: doAuthRememberMeFilter
+cache: ~
+execution: ~

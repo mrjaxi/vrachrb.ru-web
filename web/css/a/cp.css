@@ -1,0 +1,29 @@
+.arm_cp, .arm_learning_plan{
+  height: 100% !important;
+  margin: 0 !important;
+}
+.arm_cp__timeline{
+  background-color: #edf7f9;
+  border-top: 1px solid #d5dee0;
+  border-bottom: 1px solid #d5dee0;
+}
+.arm_cp__timeline__item{
+  display: inline-block;
+  padding: 10px 11px;
+  color: #22292b;
+  cursor: pointer;
+}
+.arm_cp__timeline__item:hover{
+  background-color: #d5dee0;
+}
+.arm_cp__timeline__item__current{
+  font-weight: bold;
+}
+.arm_cp__workspace{
+  background-color: #f7f7f7;
+  height: 100%;
+  padding-left: 10px;
+}
+.arm_cp__timeline__item__epoch{
+  border-left: 1px solid #d5dee0;
+}

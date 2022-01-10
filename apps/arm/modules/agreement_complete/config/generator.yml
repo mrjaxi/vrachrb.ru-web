@@ -1,0 +1,41 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           AgreementComplete
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          agreement_complete
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: -6
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        user_id: {label: 'Пользователь'}
+        agreement_id: {label: 'Соглашение'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Подтвержденные соглашения'
+        display: [user_id, agreement_id]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование соглашения
+      new:
+        title: Добавление соглашения

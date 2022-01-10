@@ -1,0 +1,40 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Lpu
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          lpu
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 1
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        title: {label: Название}
+        location: {label: 'Расположение'}
+        token: {label: 'Ключ'}
+      list:
+        layout: ~
+        title: 'ЛПУ'
+        display: [title, location]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование ЛПУ
+      new:
+        title: Добавление ЛПУ

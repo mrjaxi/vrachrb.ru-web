@@ -1,0 +1,38 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Permission
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          permission
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 7000
+    skip: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: 'ID'}
+        credential: {label: 'Правило'}
+        description: {label: 'Описание'}
+      list:
+        layout: ~
+        title: 'Права'
+        display: [credential, description]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование правила
+      new:
+        title: Новое правило

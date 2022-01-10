@@ -1,0 +1,49 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Question
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          question
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 10
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        user_id: {label: 'От кого'}
+        user: {label: 'От кого'}
+        user_about_id: {label: 'Член семьи'}
+        body: {label: 'Вопрос'}
+        vk_notice: {label: 'Уведомление ВК'}
+        is_anonymous: {label: 'Анонимно'}
+        approved: {label: 'Одобрено'}
+        comment_id: {label: 'id Комментария ВК'}
+        closed_by: {label: 'Кем закрыто (Специалист)'}
+        closing_date: {label: 'Дата закрытия'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Вопросы'
+        sort: [created_at, desc]
+        display: [_user, _body, is_anonymous, approved, _closed_by, comment_id, vk_notice, _timer, _specialist, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [body, u.second_name, u.first_name, u.middle_name, su.second_name, su.first_name, su.middle_name, u.email, u.username]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование вопроса
+      new:
+        title: Добавление вопроса

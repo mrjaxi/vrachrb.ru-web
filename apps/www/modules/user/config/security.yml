@@ -1,0 +1,30 @@
+appeal:
+  is_secure: false
+social_request:
+  is_secure: false
+set_mifare:
+  is_secure: false
+setpin:
+  is_secure: false
+review:
+  is_secure: false
+public_timetable:
+  is_secure: false
+start:
+  is_secure: false
+set_uid_state:
+  is_secure: false
+get_number_by_iud:
+  is_secure: false
+update_user_info:
+  is_secure: false
+ping:
+  is_secure: false
+whoami:
+  is_secure: false
+activate:
+  is_secure: false
+ui_by_num:
+  is_secure: false
+get_number_by_mid:
+  is_secure: false

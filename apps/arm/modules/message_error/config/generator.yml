@@ -1,0 +1,44 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Message_error
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          message_error
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: -10
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        body: {label: 'Ошибка или пожелание'}
+        photo: {label: 'Фотография'}
+        user_id: {label: 'Пользователь'}
+        user: {label: 'Пользователь'}
+        status: {label: 'Статус'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Сообщения об ошибках'
+        sort: [created_at, desc]
+        display: [body, _photo, _user, _status, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование 
+      new:
+        title: Добавление 

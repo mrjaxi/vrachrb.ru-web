@@ -1,0 +1,48 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Article
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          article
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 50
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        specialist_id: {label: 'Cпециалист'}
+        specialist: {label: 'Специалист'}
+        title: {label: Название}
+        photo: {label: 'Фотография'}
+        video: {label: 'Код видео www.youtube.com'}
+        description: {label: 'Краткое описание'}
+        body: {label: 'Текст статьи'}
+        is_activated: {label: 'Реклама'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Статьи'
+        display: [title, _specialist, _photo, is_activated, created_at]
+        sort: [created_at, desc]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title, u.second_name, u.first_name, u.middle_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование статьи
+      new:
+        title: Добавление статьи

@@ -1,0 +1,50 @@
+User:
+  actAs: 
+    Timestampable: ~
+  columns:
+    username:
+      type: string(128)
+      notnull: true
+      unique: true
+    first_name:
+      type: string(255)
+    second_name:
+      type: string(255)
+    middle_name:
+      type: string(255)
+    gender:
+      type: string(1)
+      notnull: true
+    birth_date:
+      type: timestamp
+      notnull: true
+    email:
+      type: string(128)
+      notnull: false
+    phone:
+      type: string(255)
+      notnull: false
+    salt: string(128)
+    password: string(128)
+    photo: string(255)
+    is_active:
+      type: boolean
+      default: 1
+    is_super_admin:
+      type: boolean
+      default: false
+    last_login:
+      type: timestamp
+    password_check:
+      type: string(255)
+  relations:
+    UserPermissions:
+      class: Permission
+      local: user_id
+      foreign: permission_id
+      refClass: UserPermissions
+      onDelete: CASCADE
+  indexes:
+    name_idx:
+      fields: [username]
+      unique: true

@@ -1,0 +1,43 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Complaint
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          complaint
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 22
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        question_id: {label: 'Вопрос'}
+        question: {label: 'Вопрос'}
+        specialist_id: {label: 'Специалист'}
+        specialist: {label: 'Специалист'}
+        body: {label: 'Жалоба'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Жалобы'
+        display: [_question, _specialist, _body, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [body, q.body, u.first_name, u.second_name, u.middle_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование жалобы
+      new:
+        title: Добавление жалобы

@@ -1,0 +1,47 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Specialist
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          specialist
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 60
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        user_id: {label: 'Пользователь'}
+        user: {label: 'Пользователь'}
+        specialty_id: {label: 'Специальность'}
+        specialty: {label: 'Специальность'}
+        rating: {label: 'Рейтинг'}
+        answers_count: {label: 'Количество консультаций'}
+        about: {label: 'Описание'}
+        education: {label: 'Образование и работа'}
+        certificate: {label: 'Сертификаты'}
+        live_reception: {label: 'Очный прием'}
+        sfm: {label: 'ФИО'}
+      list:
+        layout: ~
+        title: 'Специалисты'
+        display: [user, _sfm, specialty, rating, answers_count]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [u.second_name, u.first_name, s.title]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование врача
+      new:
+        title: Добавление врача

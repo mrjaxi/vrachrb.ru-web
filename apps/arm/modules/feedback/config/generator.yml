@@ -1,0 +1,43 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Feedback
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          feedback
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: -9
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        user_id: {label: 'Пользователь'}
+        user: {label: 'Пользователь'}
+        body: {label: 'Вопрос или предложение'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата редактирования'}
+      list:
+        layout: ~
+        title: 'Обратная связь'
+        sort: [created_at, desc]
+        display: [_user, _body, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [r.body, u.first_name, u.second_name, u.middle_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование записи
+      new:
+        title: Добавление записи

@@ -1,0 +1,37 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           LpuSpecialist
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          lpu_specialist
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    skip: true
+
+    config:
+      actions: ~
+      fields:
+        lpu_id: {label: ''}
+        specialist_id: {label: ''}
+      list:
+        layout: ~
+        title: 'Новый модуль'
+        display: ~
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование 
+      new:
+        title: Добавление 

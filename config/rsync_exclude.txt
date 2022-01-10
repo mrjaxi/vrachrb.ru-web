@@ -1,0 +1,6 @@
+/test/*
+/upload/*
+/.idea/*
+/log/*
+/config/databases.yml
+/.ramcache/*

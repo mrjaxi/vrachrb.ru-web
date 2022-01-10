@@ -1,0 +1,44 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Answer
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          answer
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 20
+    skip: 1
+
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        user_id: {label: 'Пользователь'}
+        user: {label: 'Пользователь'}
+        question_id: {label: '№ вопроса'}
+        body: {label: 'Ответ'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Ответы'
+        display: [_user, question_id, _body, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование ответа
+      new:
+        title: Добавление ответа

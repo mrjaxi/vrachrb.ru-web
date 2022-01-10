@@ -1,0 +1,47 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Reception_contract
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          reception_contract
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        user_id: {label: 'Кто'}
+        user: {label: 'Кто'}
+        specialist_id: {label: 'К кому'}
+        specialist: {label: 'К кому'}
+        question_id: {label: 'Вопрос №'}
+        question: {label: 'Вопрос'}
+        price: {label: 'Цена (руб)'}
+        is_activated: {label: Подтвержден}
+        is_reject: {label: Отказ от приема}
+        reject_reason: {label: Причина отказа от очного приема}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Записи на прием'
+        display: [_user, _specialist, _question, price, is_activated, is_reject, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [q.body, u.second_name, u.first_name, u.middel_name, su.second_name, su.first_name, su.middle_name, i.second_name, i.first_name, i.middle_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование записи на прием
+      new:
+        title: Добавление записи на прием

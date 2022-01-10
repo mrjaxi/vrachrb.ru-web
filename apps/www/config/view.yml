@@ -1,0 +1,23 @@
+default:
+  http_metas:
+    content-type: text/html
+  metas:
+    robots: 'index, follow'
+    viewport: 'width=device-width, initial-scale=0.1'
+    yandex-verification: 3d4e1efabcfec282
+    google-site-verification: 7UqfPTyxQolVy8z4quN0e5U0I4FnKUuItw_VEPstWTE
+  stylesheets:
+    - 'fonts.css?deploy=1459257674'
+    - 'g.css?deploy=30082016'
+    - 'p.css?upload=30082016'
+    - 'a.css?deploy=1459257674'
+    - 'mur.css?deploy=1459257674'
+  javascripts:
+    - 'jquery-1.10.2.min.js?deploy=1459257674'
+    - 'jquery.plugins.js?deploy=1459257674'
+    - 'mur.d.js?deploy=1459257674'
+    - 'init.d.js?deploy=30082016'
+  has_layout: true
+  layout: layout
+frame:
+  layout: frame

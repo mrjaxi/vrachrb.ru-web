@@ -1,0 +1,39 @@
+# You can find more information about this file on the symfony website:
+# http://www.symfony-project.org/reference/1_4/en/04-Settings
+
+prod:
+  .settings:
+    logging_enabled: false
+    cache: true
+    min_view: false
+
+dev:
+  .settings:
+    error_reporting: <?php echo ((E_ALL) ^ E_NOTICE)."\n" ?>
+    web_debug: false
+    cache: true
+    logging_enabled: false
+    min_view: false
+
+test:
+  .settings:
+    error_reporting: <?php echo ((E_ALL | E_STRICT) ^ E_NOTICE)."\n" ?>
+    cache: false
+    web_debug: false
+
+all:
+  .settings:
+    csrf_secret: 2450ecb2853511b9f9137ee54890608d0b8c62dd
+    escaping_strategy: true
+    escaping_method: ESC_SPECIALCHARS
+    use_database: true
+    no_script_name: true
+    enabled_modules: [default, baseAuth, csSetting]
+    default_culture: ru_RU
+    standard_helpers: [Partial, Cache, I18N]
+    i18n: true
+  .actions:
+    login_module: baseAuth
+    login_action: signin
+    secure_module: baseAuth
+    secure_action: secure

@@ -1,0 +1,45 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Comment
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          comment
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 25
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        user_id: {label: 'Пользователь'}
+        user: {label: 'Пользователь'}
+        article_id: {label: 'Статья'}
+        article: {label: 'Статья'}
+        prompt_id: {label: 'Совет'}
+        prompt: {label: 'Совет'}
+        body: {label: 'Комментарий'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Комментарии'
+        display: [_user, _article, _prompt, _body, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [u.first_name, u.second_name, u.middle_name, body]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование комментария
+      new:
+        title: Добавление комментария

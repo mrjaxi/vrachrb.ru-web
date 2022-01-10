@@ -1,0 +1,1 @@
+<?php include_partial('consilium', array('councils' => $councils, 'ajax' => 'y'));?>

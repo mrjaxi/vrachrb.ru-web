@@ -1,0 +1,15 @@
+.sf_admin_row__pagei{
+  background-color: #e4e4e4;
+}
+.sf_admin_row__pagei td{
+  border-bottom-color: #fff;
+}
+.sf_admin_row__pagei_a{
+  display: block;
+  min-width: 500px;
+  border: none;
+  padding: 10px 10px 10px 10px;
+}
+.sf_admin_row__pagei_a_td{
+  padding: 0 !important;
+}

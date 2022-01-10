@@ -1,0 +1,43 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Agreement
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          agreement
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: -8
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        title: {label: Название}
+        body: {label: 'Текст соглашения'}
+        description: {label: 'Краткое описание'}
+        file: {label: 'Файл соглашения'}
+        in_documentation: {label: 'Показать в документации'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Соглашения'
+        display: [title, in_documentation, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование соглашения
+      new:
+        title: Добавление соглашения

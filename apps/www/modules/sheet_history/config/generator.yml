@@ -1,0 +1,37 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           SheetHistory
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          sheet_history
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 65
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        title: {label: Название}
+      list:
+        layout: ~
+        title: 'Листы анамнеза'
+        display: [title]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование листа
+      new:
+        title: Новый лист

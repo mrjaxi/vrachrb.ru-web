@@ -1,0 +1,399 @@
+seo:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Seo
+    module:               seo
+    prefix_path:          /seo
+    column:               id
+    with_wildcard_routes: true
+
+agreement_complete:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                AgreementComplete
+    module:               agreement_complete
+    prefix_path:          /agreement_complete
+    column:               id
+    with_wildcard_routes: true
+
+agreement:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Agreement
+    module:               agreement
+    prefix_path:          /agreement
+    column:               id
+    with_wildcard_routes: true
+
+question_sheet_history:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                QuestionSheetHistory
+    module:               question_sheet_history
+    prefix_path:          /question_sheet_history
+    column:               id
+    with_wildcard_routes: true
+
+question_admin:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Question
+    module:               question_admin
+    prefix_path:          /question_admin
+    column:               id
+    with_wildcard_routes: true
+
+question_question_admin:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Question
+    module:               question_admin
+    prefix_path:          /question_admin
+    column:               id
+    with_wildcard_routes: true
+
+donate_sponsors:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Donate_sponsors
+    module:               donate_sponsors
+    prefix_path:          /donate_sponsors
+    column:               id
+    with_wildcard_routes: true
+
+message_error:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Message_error
+    module:               message_error
+    prefix_path:          /message_error
+    column:               id
+    with_wildcard_routes: true
+
+analysis:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Analysis
+    module:               analysis
+    prefix_path:          /analysis
+    column:               id
+    with_wildcard_routes: true
+
+analysis_type:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Analysis_type
+    module:               analysis_type
+    prefix_path:          /analysis_type
+    column:               id
+    with_wildcard_routes: true
+
+attached_family_users:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Attached_family_users
+    module:               attached_family_users
+    prefix_path:          /attached_family_users
+    column:               id
+    with_wildcard_routes: true
+
+notice:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Notice
+    module:               notice
+    prefix_path:          /notice
+    column:               id
+    with_wildcard_routes: true
+
+lpu_specialist:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                LpuSpecialist
+    module:               lpu_specialist
+    prefix_path:          /lpu_specialist
+    column:               Array
+    with_wildcard_routes: true
+
+lpu:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Lpu
+    module:               lpu
+    prefix_path:          /lpu
+    column:               id
+    with_wildcard_routes: true
+
+receive_datetime:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Receive_datetime
+    module:               receive_datetime
+    prefix_path:          /receive_datetime
+    column:               id
+    with_wildcard_routes: true
+
+specialist_work_place:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Specialist_work_place
+    module:               specialist_work_place
+    prefix_path:          /specialist_work_place
+    column:               id
+    with_wildcard_routes: true
+
+complaint:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Complaint
+    module:               complaint
+    prefix_path:          /complaint
+    column:               id
+    with_wildcard_routes: true
+
+consilium_answer:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Consilium_answer
+    module:               consilium_answer
+    prefix_path:          /consilium_answer
+    column:               id
+    with_wildcard_routes: true
+
+consilium:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Consilium
+    module:               consilium
+    prefix_path:          /consilium
+    column:               id
+    with_wildcard_routes: true
+
+advertising:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Advertising
+    module:               advertising
+    prefix_path:          /advertising
+    column:               id
+    with_wildcard_routes: true
+
+question_specialist:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Question_specialist
+    module:               question_specialist
+    prefix_path:          /question_specialist
+    column:               id
+    with_wildcard_routes: true
+
+specialist_online:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Specialist_online
+    module:               specialist_online
+    prefix_path:          /specialist_online
+    column:               id
+    with_wildcard_routes: true
+
+reception_contract:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Reception_contract
+    module:               reception_contract
+    prefix_path:          /reception_contract
+    column:               id
+    with_wildcard_routes: true
+
+feedback:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Feedback
+    module:               feedback
+    prefix_path:          /feedback
+    column:               id
+    with_wildcard_routes: true
+
+sheet_history:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                SheetHistory
+    module:               sheet_history
+    prefix_path:          /sheet_history
+    column:               id
+    with_wildcard_routes: true
+
+banner:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Banner
+    module:               banner
+    prefix_path:          /banner
+    column:               id
+    with_wildcard_routes: true
+
+review:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Review
+    module:               review
+    prefix_path:          /review
+    column:               id
+    with_wildcard_routes: true
+
+question:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Question
+    module:               question
+    prefix_path:          /question
+    column:               id
+    with_wildcard_routes: true
+
+prompt:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Prompt
+    module:               prompt
+    prefix_path:          /prompt
+    column:               id
+    with_wildcard_routes: true
+
+partner:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Partner
+    module:               partner
+    prefix_path:          /partner
+    column:               id
+    with_wildcard_routes: true
+
+news:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                News
+    module:               news
+    prefix_path:          /news
+    column:               id
+    with_wildcard_routes: true
+
+documentation:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Documentation
+    module:               documentation
+    prefix_path:          /documentation
+    column:               id
+    with_wildcard_routes: true
+
+comment:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Comment
+    module:               comment
+    prefix_path:          /comment
+    column:               id
+    with_wildcard_routes: true
+
+article:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Article
+    module:               article
+    prefix_path:          /article
+    column:               id
+    with_wildcard_routes: true
+
+answer:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Answer
+    module:               answer
+    prefix_path:          /answer
+    column:               id
+    with_wildcard_routes: true
+
+specialty:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Specialty
+    module:               specialty
+    prefix_path:          /specialty
+    column:               id
+    with_wildcard_routes: true
+
+specialist:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Specialist
+    module:               specialist
+    prefix_path:          /specialist
+    column:               id
+    with_wildcard_routes: true
+
+action:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Action
+    module:               action
+    prefix_path:          /action
+    column:               id
+    with_wildcard_routes: true
+
+user:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                User
+    module:               user
+    prefix_path:          /user
+    column:               id
+    with_wildcard_routes: true
+
+page:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Page
+    module:               page
+    prefix_path:          /page
+    column:               id
+    with_wildcard_routes: true
+
+permission:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                Permission
+    module:               permission
+    prefix_path:          /permission
+    column:               id
+    with_wildcard_routes: true
+
+jcrop:
+  url: /jcrop
+  param: { module: main, action: jcrop }
+
+event_elem:
+  url: /event-elem/
+  param: { module: main, action: event_elem }
+
+uploader:
+  url: /uploader
+  param: { module: main, action: uploader }
+
+signin:
+  url: /login
+  param: { module: baseAuth, action: signin }
+
+signout:
+  url: /logout
+  param: { module: baseAuth, action: signout }
+
+homepage:
+  url:   /
+  param: { module: question, action: index }
+
+default_index:
+  url:   /:module
+  param: { action: index }
+  
+default:
+  url:   /:module/:action/*

@@ -1,0 +1,41 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Consilium
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          consilium
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 21
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        question_id: {label: 'Вопрос'}
+        question: {label: 'Вопрос'}
+        closed: {label: 'Консилиум завершен'}
+        closing_date: {label: 'Дата закрытия'}
+        created_at: {label: 'Дата создания'}
+      list:
+        layout: ~
+        title: 'Консилиумы'
+        display: [_question, closed, closing_date, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [q.body]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование консилиума
+      new:
+        title: Добавление консилиума

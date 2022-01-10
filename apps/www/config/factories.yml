@@ -1,0 +1,42 @@
+prod:
+  logger:
+    class: sfNoLogger
+    param:
+      level: err
+      loggers: ~
+
+all:
+  storage:
+    class: sfPDOSessionStorage
+    param:
+      session_name: www
+      database: doctrine
+      db_table: session
+      db_id_col: id
+      db_data_col: session_data
+      db_time_col: session_time
+  mailer:
+    param:
+      delivery_strategy: realtime
+      transport:
+        class: Swift_MailTransport
+#  mailer:
+#    param:
+#      delivery_strategy: spool
+#      spool_class: Swift_FileSpool
+#      spool_arguments: [/www/vrachrb.ru/log]
+
+  routing:
+    class: sfPatternRouting
+    param:
+      generate_shortest_url: true
+      extra_parameters_as_query_string: true
+  view_cache:
+    class: sfFileCache
+    param:
+      automatic_cleaning_factor: 0
+  view_cache_manager:
+    class: sfViewCacheManager
+    param:
+      cache_key_use_vary_headers: true
+      cache_key_use_host_name: true

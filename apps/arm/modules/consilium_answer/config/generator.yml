@@ -1,0 +1,43 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Consilium_answer
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          consilium_answer
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 22
+    skip: 1
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        consilium_id: {label: 'Консилиум'}
+        specialist_id: {label: 'Специалист'}
+        specialist: {label: 'Специалист'}
+        body: {label: 'Ответ'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Ответы консилиума'
+        display: [consilium_id, _specialist, _body, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование ответа
+      new:
+        title: Добавление ответа

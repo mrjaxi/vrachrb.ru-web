@@ -1,0 +1,8 @@
+all:
+  doctrine:
+    class: sfDoctrineDatabase
+    profiler: false
+    param:
+      dsn: 'mysql:host=127.0.0.1;dbname=vrachrb.ru'
+      username: vrachrb.ru
+      password: AIpFmmxMseRtthvCSs67

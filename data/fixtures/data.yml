@@ -1,0 +1,11 @@
+User:
+  User_1:
+    username: root
+    first_name: Администратор
+    second_name: ''
+    middle_name: ''
+    email: ilzhan@ya.ru
+    salt: '1'
+    password: sg4iun6b
+    is_active: true
+    is_super_admin: true

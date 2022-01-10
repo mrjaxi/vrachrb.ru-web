@@ -1,0 +1,40 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Attached_family_users
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          attached_family_users
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 1010
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        user_id: {label: 'Пользователь'}
+        user: {label: 'Пользователь'}
+        user_about_id: {label: 'Профиль члена семьи'}
+        user_about: {label: 'Профиль члена семьи'}
+      list:
+        layout: ~
+        title: 'Профили семьи пользователя'
+        display: [_user, _user_about]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [u.first_name, u.second_name, u.middle_name, ua.first_name, ua.second_name, ua.middle_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование 
+      new:
+        title: Добавление 

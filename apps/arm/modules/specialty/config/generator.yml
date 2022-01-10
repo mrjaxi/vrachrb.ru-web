@@ -1,0 +1,38 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Specialty
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          specialty
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 85
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        title: {label: Название}
+        description: {label: Описание}
+      list:
+        layout: ~
+        title: 'Специальности'
+        display: [title]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [title]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование специальности
+      new:
+        title: Добавление специальности

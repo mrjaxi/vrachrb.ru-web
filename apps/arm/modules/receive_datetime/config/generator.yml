@@ -1,0 +1,38 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Receive_datetime
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          receive_datetime
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    skip: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        reception_id: {label: 'Запись на прием'}
+        datetime: {label: 'Дата и время'}
+      list:
+        layout: ~
+        title: 'Дата и время приема'
+        display: ~
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование даты и времени приема
+      new:
+        title: Добавление даты и времени приема

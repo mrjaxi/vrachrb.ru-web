@@ -1,0 +1,1121 @@
+UserGroup:
+  actAs: 
+    Timestampable: ~
+  columns:
+    title:
+      type: string(128)
+      notnull: true
+  relations:
+    UserGroupPermissions:
+      onDelete: CASCADE
+      class: Permission
+      local: user_group_id
+      foreign: permission_id
+      refClass: UserGroupPermissions
+    UserGroupUsers:
+      onDelete: CASCADE
+      class: User
+      local: user_group_id
+      foreign: user_id
+      refClass: UserGroupUsers
+
+UserGroupUsers:
+  columns:
+    user_id:
+      type: integer
+      primary: true
+    user_group_id:
+      type: integer
+      primary: true
+
+UserGroupPermissions:
+  columns:
+    user_group_id:
+      type: integer
+      primary: true
+    permission_id:
+      type: integer
+      primary: true
+
+UserPermissions:
+  columns:
+    user_id:
+      type: integer
+      primary: true
+    permission_id:
+      type: integer
+      primary: true
+
+Permission:
+  columns:
+    credential:
+      type: string(255)
+      notnull: true
+      unique: true
+    description:
+      type: string(255)
+
+UserLog:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    log_type:
+      type: string(50)
+      notnull: true
+    model:
+      type: string(50)
+      notnull: true
+    model_id:
+      type: integer
+      notnull: true
+    log:
+      type: string
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+  indexes:
+    model_idx:
+      fields: [model]
+    model_id_idx:
+      fields: [model_id]
+
+Page:
+  actAs:
+    Timestampable: ~
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    folder:
+      type: string(255)
+      notnull: false
+      unique: true
+    body:
+      type: text
+      notnull: true
+    is_activated:
+      type: boolean
+      notnull: true
+      default: true
+
+Log:
+  actAs:
+    Timestampable: ~
+  columns:
+    modelname:
+      type: string(50)
+      notnull: true
+    serialize:
+      type: string(50000)
+
+LogMessage:
+  actAs:
+    Timestampable: ~
+  columns:
+    type:
+      type: string(50)
+      notnull: true
+    body:
+      type: string(10000)
+
+Session:
+  columns:
+    id:
+      type: string(32)
+      primary: true
+    session_data:
+      type: text
+    session_time:
+      type: integer
+    user_id:
+      type: integer
+      notnull: false
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+
+Agreement:
+  actAs:
+    Timestampable: ~
+  columns:
+    title:
+      type: string(1000)
+      notnull: true
+    description:
+      type: string(1000)
+      notnull: true
+    body:
+      type: string(10000)
+      notnull: false
+    file:
+      type: string(255)
+      notnull: false
+    in_documentation:
+      type: boolean
+      notnull: true
+      default: false
+
+AgreementComplete:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    agreement_id:
+      type: integer
+      notnull: true
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    Agreement:
+      onDelete: CASCADE
+      local: agreement_id
+      foreign: id
+
+Specialist:
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    specialty_id:
+      type: integer
+      notnull: true
+    title_url:
+      type: string(1000)
+      notnull: true
+    rating:
+      type: float(2,1)
+    answers_count:
+      type: integer
+    about:
+      type: string(10000)
+    education:
+      type: string(10000)
+    live_reception:
+      type: boolean
+      notnull: true
+      default: false
+    certificate:
+      type: string(10000)
+      notnull: false
+    question_count:
+      type: integer
+      notnull: false
+    prompt_count:
+      type: integer
+      notnull: false
+    article_count:
+      type: integer
+      notnull: false
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    Specialty:
+      onDelete: CASCADE
+      local: specialty_id
+      foreign: id
+    Questions:
+      onDelete: CASCADE
+      class: Question
+      local: specialist_id
+      foreign: question_id
+      refClass: QuestionSpecialist
+    Consiliums:
+      onDelete: CASCADE
+      class: Consilium
+      local: specialist_id
+      foreign: consilium_id
+      refClass: ConsiliumSpecialist
+    Lpus:
+      onDelete: CASCADE
+      class: Lpu
+      local: specialist_id
+      foreign: lpu_id
+      refClass: LpuSpecialist
+
+Specialist_online:
+  columns:
+    specialist_id:
+      type: integer
+      notnull: true
+    date:
+      type: timestamp
+      notnull: true
+  relations:
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+Specialty:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    description:
+      type: string(1000)
+      notnull: false
+  relations:
+    Questions:
+      onDelete: CASCADE
+      class: Question
+      local: specialty_id
+      foreign: question_id
+      refClass: QuestionSpecialty
+
+Review:
+  actAs:
+    Timestampable: ~
+  columns:
+    question_id:
+      type: integer
+      notnull: true
+    user_id:
+      type: integer
+      notnull: true
+    specialist_id:
+      type: integer
+      notnull: true
+    body:
+      type: text
+    informative:
+      type: integer
+      notnull: true
+      default: 0
+    courtesy:
+      type: integer
+      notnull: true
+      default: 0
+    approved:
+      type: boolean
+      notnull: true
+      default: 0
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+Prompt:
+  actAs:
+    Timestampable: ~
+  columns:
+    specialist_id:
+      type: integer
+      notnull: true
+    specialty_id:
+      type: integer
+      notnull: true
+    title:
+      type: string(255)
+      notnull: true   
+    title_url:
+      type: string(1000)
+      notnull: true      
+    photo:
+      type: string(255)
+    video:
+      type: string(1000)
+      notnull: false
+    description:
+      type: string(255)
+      notnull: true
+    body:
+      type: text
+  relations:
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+    Specialty:
+      onDelete: CASCADE
+      local: specialty_id
+      foreign: id
+
+Article:
+  actAs:
+    Timestampable: ~
+  columns:
+    specialist_id:
+      type: integer
+      notnull: true  
+    title:
+      type: text
+      notnull: true  
+    title_url:
+      type: string(1000)
+      notnull: true  
+    photo:
+      type: string(255)
+      notnull: true
+    video:
+      type: string(1000)
+      notnull: false
+    description:
+      type: string(255)
+      notnull: true
+    body:
+      type: text
+      notnull: true
+    is_activated:
+      type: boolean
+      notnull: true
+      default: false
+  relations:
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+Comment:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true 
+    article_id:
+      type: integer 
+    prompt_id:
+      type: integer
+    body:
+      type: text
+      notnull: true
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    Article:
+      onDelete: CASCADE
+      local: article_id
+      foreign: id
+    Prompt:
+      onDelete: CASCADE
+      local: prompt_id
+      foreign: id
+
+Seo:
+  columns:
+    title_h:
+      type: string(1000)
+      notnull: false
+    title_tag:
+      type: string(1000)
+      notnull: false
+    description_tag:
+      type: string(1000)
+      notnull: false
+    url:
+      type: string(1000)
+      notnull: true
+
+Question:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    user_about_id:
+      type: integer
+    body:
+      type: text
+      notnull: true
+    is_anonymous:
+      type: boolean
+      notnull: true
+      default: false
+    approved:
+      type: boolean
+      notnull: true
+      default: 0
+    comment_id:
+      type: string(255)
+      notnull: false
+    topic_id:
+      type: string(255)
+      notnull: false
+    vk_notice:
+      type: boolean
+      notnull: false
+      default: false
+    closed_by:
+      type: integer
+      notnull: false
+    closing_date:
+      type: timestamp
+      notnull: false
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    UserAbout:
+      class: User
+      onDelete: CASCADE
+      local: user_about_id
+      foreign: id
+    UserClosed:
+      class: User
+      onDelete: CASCADE
+      local: closed_by
+      foreign: id
+    Specialists:
+      onDelete: CASCADE
+      class: Specialist
+      local: question_id
+      foreign: specialist_id
+      refClass: QuestionSpecialist
+    Specialtys:
+      onDelete: CASCADE
+      class: Specialty
+      local: question_id
+      foreign: specialty_id
+      refClass: QuestionSpecialty
+
+Question_black_list:
+  actAs:
+    Timestampable: ~
+  columns:
+    question_id:
+      type: integer
+      notnull: true
+    specialist_id:
+      type: integer
+      notnull: true
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+Specialist_work_place:
+  columns:
+    specialist_id:
+      type: integer
+      notnull: true
+    title:
+      type: string(255)
+      notnull: true
+    hidden:
+      type: boolean
+      notnull: true
+      default: 0
+  relations:
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+    Reception_contract:
+      onDelete: CASCADE
+      class: Reception_contract
+      local: work_place_id
+      foreign: reception_id
+      refClass: ReceiveLocation
+
+Consilium:
+  actAs:
+    Timestampable: ~
+  columns:
+    question_id:
+      type: integer
+      notnull: true
+    closed:
+      type: boolean
+      notnull: true
+      default: false
+    closing_date:
+      type: timestamp
+      notnull: false
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    Specialists:
+      onDelete: CASCADE
+      class: Specialist
+      local: consilium_id
+      foreign: specialist_id
+      refClass: ConsiliumSpecialist
+
+ConsiliumSpecialist:
+  columns:
+    consilium_id:
+      type: integer
+      primary: true
+    specialist_id:
+      type: integer
+      primary: true
+  relations:
+    Consilium:
+      onDelete: CASCADE
+      local: consilium_id
+      foreign: id
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+Consilium_answer:
+  actAs:
+    Timestampable: ~
+  columns:
+    consilium_id:
+      type: integer
+      notnull: true
+    specialist_id:
+      type: integer
+      notnull: true
+    body:
+      type: text
+      notnull: true
+  relations:
+    Consilium:
+      onDelete: CASCADE
+      local: consilium_id
+      foreign: id
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+Complaint:
+  actAs:
+    Timestampable: ~
+  columns:
+    question_id:
+      type: integer
+      notnull: true
+    specialist_id:
+      type: integer
+      notnull: true
+    body:
+      type: text
+      notnull: false
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+Reception_contract:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    specialist_id:
+      type: integer
+      notnull: true
+    question_id:
+      type: integer
+      notnull: true
+    price:
+      type: integer
+      notnull: false
+      default: 0
+    is_activated:
+      type: boolean
+      notnull: true
+      default: false
+    is_reject:
+      type: boolean
+      notnull: true
+      default: false
+    reject_reason:
+      type: string(255)
+      notnull: false
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    Location:
+      onDelete: CASCADE
+      class: Specialist_work_place
+      local: reception_id
+      foreign: work_place_id
+      refClass: ReceiveLocation
+
+ReceiveLocation:
+  columns:
+    reception_id:
+      type: integer
+      primary: true
+    work_place_id:
+      type: integer
+      primary: true
+  relations:
+    Reception_contract:
+      onDelete: CASCADE
+      local: reception_id
+      foreign: id
+    Specialist_work_place:
+      onDelete: CASCADE
+      local: work_place_id
+      foreign: id
+
+Receive_datetime:
+  columns:
+    reception_id:
+      type: integer
+      notnull: true
+    datetime:
+      type: timestamp
+      notnull: true
+  relations:
+    Reception_contract:
+      onDelete: CASCADE
+      local: reception_id
+      foreign: id
+
+Answer:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    question_id:
+      type: integer
+      notnull: true
+    body:
+      type: text
+      notnull: true
+    type:
+      type: string(255)
+      notnull: false
+    comment_id:
+      type: string(255)
+      notnull: false
+    attachment:
+      type: string(10000)
+      notnull: false
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+
+Analysis:
+  actAs:
+    Timestampable: ~
+  columns:
+    answer_id:
+      type: integer
+      notnull: true
+    user_id:
+      type: integer
+      notnull: true
+    analysis_type_id:
+      type: integer
+      notnull: true
+    photo:
+      type: string(255)
+      notnull: true
+  relations:
+    Answer:
+      onDelete: CASCADE
+      local: answer_id
+      foreign: id
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    Analysis_type:
+      onDelete: CASCADE
+      local: analysis_type_id
+      foreign: id
+
+Analysis_type:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    description:
+      type: string(255)
+      notnull: true
+
+News:
+  actAs:
+    Timestampable: ~
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    title_url:
+      type: string(1000)
+      notnull: true
+    body:
+      type: text
+      notnull: true
+    photo:
+      type: string(255)
+      notnull: true
+    video:
+      type: string(1000)
+      notnull: false
+
+Documentation:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    file:
+      type: string(255)
+      notnull: true
+    order_field:
+      type: integer
+      notnull: true
+      default: 0
+
+Partner:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    logo:
+      type: string(255)
+      notnull: true
+    body:
+      type: text
+    link:
+      type: string(255)
+    order_field:
+      type: integer
+      notnull: true
+      default: 0
+
+QuestionData:
+  columns:
+    question_id:
+      type: integer
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+
+QuestionSpecialist:
+  columns:
+    question_id:
+      type: integer
+      primary: true
+    specialist_id:
+      type: integer
+      primary: true
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    Specialist:
+      onDelete: CASCADE
+      local: specialist_id
+      foreign: id
+
+QuestionSpecialty:
+  columns:
+    question_id:
+      type: integer
+      primary: true
+    specialty_id:
+      type: integer
+      primary: true
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    Specialty:
+      onDelete: CASCADE
+      local: specialty_id
+      foreign: id
+
+Banner:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    link:
+      type: string(255)
+    photo:
+      type: string(255)
+    is_activated:
+      type: boolean
+      notnull: true
+      default: true
+    order_field:
+      type: integer
+      notnull: true
+      default: 0
+
+Lpu:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    location:
+      type: string(255)
+    token:
+      type: string(255)
+  relations:
+    Specialists:
+      onDelete: CASCADE
+      class: Lpu
+      local: lpu_id
+      foreign: specialist_id
+      refClass: LpuSpecialist
+
+LpuSpecialist:
+  columns:
+    lpu_id:
+      type: integer
+      primary: true
+    specialist_id:
+      type: integer
+      primary: true
+
+Advertising:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+    link:
+      type: string(255)
+    photo:
+      type: string(255)
+    is_activated:
+      type: boolean
+      notnull: true
+      default: true
+
+Feedback:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    body:
+      type: text
+      notnull: true
+  relations:
+      User:
+        onDelete: CASCADE
+        local: user_id
+        foreign: id
+
+SheetHistory:
+  columns:
+    title:
+      type: string(255)
+      notnull: true
+  relations:
+    Specialtys:
+      onDelete: CASCADE
+      class: Specialty
+      local: sheet_history_id
+      foreign: specialty_id
+      refClass: SheetHistorySpecialty
+
+SheetHistorySpecialty:
+  columns:
+    sheet_history_id:
+      type: integer
+      primary: true
+    specialty_id:
+      type: integer
+      primary: true
+  relations:
+    SheetHistory:
+      onDelete: CASCADE
+      local: sheet_history_id
+      foreign: id
+    Specialty:
+      onDelete: CASCADE
+      local: specialty_id
+      foreign: id
+
+SheetHistoryField:
+  columns:
+    sheet_history_id:
+      type: integer
+      notnull: true
+    title:
+      type: string(1000)
+      notnull: false
+    field_type:
+      type: string(50)
+      notnull: true
+    field_options:
+      type: string(10000)
+      notnull: false
+    order_field:
+      type: integer
+      notnull: true
+      default: 0
+    is_required:
+      type: boolean
+      notnull: true
+      default: true
+  relations:
+    SheetHistory:
+      onDelete: CASCADE
+      local: sheet_history_id
+      foreign: id
+
+QuestionSheetHistory:
+  columns:
+    question_id:
+      type: integer
+      notnull: true
+    sheet_history_field_id:
+      type: integer
+      notnull: true
+    value:
+      type: string(100000)
+      notnull: true
+  relations:
+    Question:
+      onDelete: CASCADE
+      local: question_id
+      foreign: id
+    SheetHistoryField:
+      onDelete: CASCADE
+      local: sheet_history_field_id
+      foreign: id
+
+Notice:
+  actAs:
+    Timestampable: ~
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    type:
+      type: string(255)
+      notnull: true
+    inner_id:
+      type: integer
+      notnull: true
+    event:
+      type: string(255)
+      notnull: true
+  relations:
+      User:
+        onDelete: CASCADE
+        local: user_id
+        foreign: id
+
+Attached_family_users:
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    user_about_id:
+      type: integer
+      notnull: true
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+    UserAbout:
+      class: User
+      onDelete: CASCADE
+      local: user_about_id
+      foreign: id
+
+Message_error:
+  actAs:
+    Timestampable: ~
+  columns:
+    body:
+      type: text
+      notnull: true
+    photo:
+      type: string(255)
+      notnull: false
+    user_id:
+      type: integer
+      notnull: false
+    status:
+      type: enum
+      values: [no_answer, detail, in_work, completed, defect]
+      default: no_answer
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+
+Donate_sponsors:
+  actAs:
+    Timestampable: ~
+  columns:
+    first_name:
+      type: string(255)
+      notnull: true
+    second_name:
+      type: string(255)
+      notnull: true
+    middle_name:
+      type: string(255)
+      notnull: true
+    amount:
+      type: integer
+      notnull: true
+    sender:
+      type: bigint(40)
+      notnull: true
+    anonymous:
+      type: boolean
+      notnull: true
+      default: false
+    json:
+      type: string(10000)
+      notnull: true

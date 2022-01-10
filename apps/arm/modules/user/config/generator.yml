@@ -1,0 +1,52 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           User
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          user
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 7010
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        username: {label: 'Логин'}
+        first_name: {label: 'Имя'}
+        second_name: {label: 'Фамилия'}
+        middle_name: {label: 'Отчество'}
+        gender: {label: 'Пол м/ж'}
+        birth_date: {label: 'Дата рождения'}
+        email: {label: 'Эл. почта'}
+        phone: {label: 'Номер телефона'}
+        salt: {label: ''}
+        password: {label: 'Пароль'}
+        photo: {label: 'Фотография'}
+        is_active: {label: 'Активирован'}
+        is_super_admin: {label: 'Доступ в АРМ'}
+        last_login: {label: 'Последний визит'}
+        created_at: {label: ''}
+        updated_at: {label: ''}
+      list:
+        layout: ~
+        title: 'Пользователи'
+        display: [username, first_name, second_name, _photo, is_super_admin, is_active, last_login]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [username, first_name, second_name]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование данных пользователя
+      new:
+        title: Новый пользователь

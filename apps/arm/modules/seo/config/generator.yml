@@ -1,0 +1,41 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Seo
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          seo
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+    order: 1010
+    hr: true
+
+    config:
+      actions: ~
+      fields:
+        id: {label: '№'}
+        title_h: {label: 'Заголовок «H1»'}
+        title_tag: {label: 'Заголовок «title»'}
+        description_tag: {label: 'Описание «meta»'}
+        url: {label: 'Относительная ссылка'}
+      list:
+        layout: ~
+        title: 'Поисковая оптимизация'
+        display: [title_h, title_tag, url]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: false
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование записи
+      new:
+        title: Добавление записи

@@ -1,0 +1,38 @@
+.arm_learning_plan__table, .arm_learning_plan__table input{
+  font-size: 11px;
+}
+.arm_learning_plan__table input{
+  padding: 1px;
+}
+.arm_learning_plan__table .small_gray{
+  color: #808080;
+  font-size: 10px;
+  text-align: center !important;
+  padding:2px !important;
+}
+.arm_learning_plan__table .small_gray2{
+  font-size: 11px;
+}
+.arm_learning_plan__table_th{
+  padding:3px 3px;
+  border: 1px solid #E0E0E0;
+  border-top: none;
+}
+.arm_learning_plan__table_th:first-child{
+  padding-left:10px;
+  text-align: left;
+}
+.arm_learning_plan__table_td{
+  padding:3px 3px;
+  border: 1px solid #E0E0E0;
+}
+.arm_learning_plan__table_td:first-child{
+  padding-left:10px;
+}
+.arm_learning_plan__table_tr:hover{
+  
+}
+.arm_learning_plan__table{
+  border-collapse: collapse;
+  border:none;
+}

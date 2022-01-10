@@ -1,0 +1,45 @@
+generator:
+  class: sfDoctrineGenerator
+  param:
+    model_class:           Donate_sponsors
+    theme:                 admin
+    non_verbose_templates: true
+    with_show:             false
+    singular:              ~
+    plural:                ~
+    route_prefix:          donate_sponsors
+    with_doctrine_route:   true
+    actions_base_class:    sfActions
+
+    config:
+      actions: ~
+      fields:
+        id: {label: ''}
+        first_name: {label: 'Имя'}
+        second_name: {label: 'Фамилия'}
+        middle_name: {label: 'Отчество'}
+        name: {label: 'ФИО'}
+        amount: {label: 'Сумма (руб)'}
+        sender: {label: 'Отправитель'}
+        anonymous: {label: 'Анонимно'}
+        json: {label: 'Все данные'}
+        created_at: {label: 'Дата создания'}
+        updated_at: {label: 'Дата изменения'}
+      list:
+        layout: ~
+        title: 'Взносы спонсоров'
+        display: [_name, amount, anonymous, created_at]
+        max_per_page: 100
+        object_actions:
+          _delete: ~
+          _edit: ~
+        search:
+          fields: [first_name, second_name, middle_name, amount]
+        export: false
+      filter:
+        class: false
+      form: ~
+      edit:
+        title: Редактирование спонсора
+      new:
+        title: Добавление спонсора

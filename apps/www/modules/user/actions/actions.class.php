@@ -2,7 +2,6 @@
 
 class userActions extends sfActions
 {
-
     public function executeLpAuth($request)
     {
         $status_code = 403;
@@ -52,6 +51,18 @@ class userActions extends sfActions
                 $this->r = true;
             }
         }
+    }
+
+    public function executeApi_signin(sfWebRequest $request)
+    {
+        $response = $request->getGetParameter("test");
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+        $this->setLayout('json');
+        $this->setTemplate('json','main');
+
+        return $this->renderText(json_encode(array(
+            "test" => $response
+        )));
     }
 
     public function executeCheck_token(sfWebRequest $request)

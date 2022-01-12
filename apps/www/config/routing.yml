@@ -410,4 +410,4 @@ live_band_update:
 # api routes
 user_api_signin:
   url: /api/signin
-  param: { module: user, action: api_signin }
+  param: { module: api, action: api_signin }

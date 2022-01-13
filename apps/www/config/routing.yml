@@ -411,3 +411,7 @@ live_band_update:
 user_api_signin:
   url: /api/signin
   param: { module: api, action: api_signin }
+
+user_api_register:
+  url: /api/register
+  param: { module: api, action: api_register }

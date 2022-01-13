@@ -1,7 +1,7 @@
 <?php
 class apiActions extends sfActions
 {
-    public function executeApi_signin(sfWebRequest $request)
+    public function executeSignin(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
@@ -10,21 +10,21 @@ class apiActions extends sfActions
 
         $usernameDoctrine = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
 
-        $response["response"] = array();
+        $response = array();
 
         if ($usernameDoctrine){
             $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
             $encrypted = call_user_func_array($algorithm, array($usernameDoctrine->get("salt") . $password));
 
             if ($encrypted == $usernameDoctrine->get("password")){
+                $this->getUser()->signIn($usernameDoctrine, 1);
+
                 $response = array(
-                    "user_id" => $usernameDoctrine->get("id"),
-                    "username" => $username,
-                    "salt" => $usernameDoctrine->get("salt"),
                     "first_name" => $usernameDoctrine->get("first_name"),
                     "second_name" => $usernameDoctrine->get("second_name"),
                     "middle_name" => $usernameDoctrine->get("middle_name"),
                 );
+
             } else {
                 $response = array(
                     "error" => "Неверное имя пользовтеля или пароль"
@@ -41,10 +41,53 @@ class apiActions extends sfActions
         ));
     }
 
-    public function executeApi_send_message(sfWebRequest $request)
+    public function executeSendMessage(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
+    }
+
+    public function executeSpecialist(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if ($this->getUser()->isAuthenticated()){
+            $allSpeciality = Doctrine::getTable('Specialist');
+
+            $response = array(
+                "response" => $allSpeciality
+            );
+        } else {
+            $response = array(
+                "error" => "Для использования метода нужно авторизоваться"
+            );
+        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
+    public function executeGetCabinet(sfWebRequest $request)
+    {
+//        var_dump($this->getUser()->getAccount()->getUsername());
+
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if ($this->getUser()->isAuthenticated()){
+            $allSpeciality = Doctrine_Core::getTable('Specialty')->findAll();
+            $response = array(
+                "response" => $allSpeciality->toArray()
+            );
+        } else {
+            $response = array(
+                "error" => "Для использования метода нужно авторизоваться"
+            );
+        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
     }
 
     public function executeApi_register(sfWebRequest $request)

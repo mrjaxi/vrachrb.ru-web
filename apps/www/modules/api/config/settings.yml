@@ -1,0 +1,8 @@
+all:
+  .actions:
+    error_404_module: main
+    error_404_action: error404
+    login_module: api
+    login_action: api_signin
+    secure_module: api
+    secure_action: api_signin

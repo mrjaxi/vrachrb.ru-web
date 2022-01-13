@@ -3,14 +3,48 @@ class apiActions extends sfActions
 {
     public function executeApi_signin(sfWebRequest $request)
     {
-        $response = $request->getGetParameter("test");
         $this->getResponse()->setHttpHeader('Content-type','application/json');
-        $this->setLayout('json');
-        $this->setTemplate('json','main');
 
-        return $this->renderText(json_encode(array(
-            "test" => $response
-        )));
+        $username = $request->getPostParameter("user");
+        $password = $request->getPostParameter("password");
+
+        $usernameDoctrine = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
+
+        $response["response"] = array();
+
+        if ($usernameDoctrine){
+            $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
+            $encrypted = call_user_func_array($algorithm, array($usernameDoctrine->get("salt") . $password));
+
+            if ($encrypted == $usernameDoctrine->get("password")){
+                $response = array(
+                    "user_id" => $usernameDoctrine->get("id"),
+                    "username" => $username,
+                    "salt" => $usernameDoctrine->get("salt"),
+                    "first_name" => $usernameDoctrine->get("first_name"),
+                    "second_name" => $usernameDoctrine->get("second_name"),
+                    "middle_name" => $usernameDoctrine->get("middle_name"),
+                );
+            } else {
+                $response = array(
+                    "error" => "Неверное имя пользовтеля или пароль"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => "Неверное имя пользовтеля или пароль"
+            );
+        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
+    public function executeApi_send_message(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
     }
 
     public function executeApi_register(sfWebRequest $request)

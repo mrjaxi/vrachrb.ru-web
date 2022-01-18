@@ -47,15 +47,51 @@ class apiActions extends sfActions
 
     }
 
+    public function executeGetSpecialistBySpecialtyID(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$request->isMethod('post'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
+
+        if (!$this->getUser()->isAuthenticated())
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+
+        $specialists = Doctrine_Query::create()
+            ->select("s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
+            ->from("Specialist s")
+            ->innerJoin("s.User u ON u.id = s.user_id and s.specialty_id = 10")
+            ->fetchArray();
+
+        return $this->renderText(json_encode(
+            array(
+                "response" => $specialists
+            )
+        ));
+    }
+
     public function executeSpecialist(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
         if ($this->getUser()->isAuthenticated()){
-            $allSpeciality = Doctrine::getTable('Specialist');
+            $q = Doctrine_Query::create()
+                ->select('s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name')
+                ->from('Specialist s')
+                ->leftJoin('s.User u ON u.id = s.user_id')
+                ->limit(10)
+                ->fetchArray();
 
             $response = array(
-                "response" => $allSpeciality
+                "response" => $q
             );
         } else {
             $response = array(

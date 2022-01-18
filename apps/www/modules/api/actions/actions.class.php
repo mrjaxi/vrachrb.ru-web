@@ -1,7 +1,48 @@
 <?php
 class apiActions extends sfActions
 {
-    public function executeSignin(sfWebRequest $request)
+    public function executeIs_auth($request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if ($this->getUser()->isAuthenticated())
+        {
+            $response = array(
+                "response" => "Вы авторизованы"
+            );
+        } else {
+            $response = array(
+                "response" => "Вы не авторизованы"
+            );
+        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
+    public function executeSignOut($request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        $this->getUser()->signOut();
+        if (!$this->getUser()->isAuthenticated())
+        {
+            $response = array(
+                "response" => "Вы вышли из аккаунта"
+            );
+        } else {
+            $response = array(
+                "error" => "Что-то пошло не так..."
+            );
+        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
+    public function executeSignIn(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
@@ -9,8 +50,6 @@ class apiActions extends sfActions
         $password = $request->getPostParameter("password");
 
         $usernameDoctrine = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
-
-        $response = array();
 
         if ($usernameDoctrine){
             $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
@@ -23,6 +62,12 @@ class apiActions extends sfActions
                     "first_name" => $usernameDoctrine->get("first_name"),
                     "second_name" => $usernameDoctrine->get("second_name"),
                     "middle_name" => $usernameDoctrine->get("middle_name"),
+                    "username" => $usernameDoctrine->get("username"),
+                    "gender" => $usernameDoctrine->get("gender"),
+                    "birth_date" => $usernameDoctrine->get("birth_date"),
+                    "email" => $usernameDoctrine->get("email"),
+                    "phone" => $usernameDoctrine->get("phone"),
+                    "photo" => $usernameDoctrine->get("photo"),
                 );
 
             } else {
@@ -33,6 +78,74 @@ class apiActions extends sfActions
         } else {
             $response = array(
                 "error" => "Неверное имя пользовтеля или пароль"
+            );
+        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
+    public function executeRegister(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type', 'application/json');
+
+        if ($request->isMethod('post')) {
+            try {
+                $params['name'] = $request->getPostParameter("name");
+                $params['familia'] = $request->getPostParameter("familia");
+                $params['last_name'] = $request->getPostParameter("last_name");
+                $params['gender'] = $request->getPostParameter("gender");
+                $params['birth_date'] = $request->getPostParameter("birth_date");
+                $params['phone'] = $request->getPostParameter("phone");
+                $params['email'] = $request->getPostParameter("email");
+                $params['password'] = $request->getPostParameter("password");
+
+                $checkUser = Doctrine::getTable('User')->findOneBy('email', $params['email']);
+                // Если нашел такого пользователя
+                if ($checkUser) {
+                    return $this->renderText(json_encode(array(
+                        "error" => "Такой пользователь уже существует",
+                    )));
+                }
+
+                $rndPasswordCheck = Page::generateUuid(32);
+                $salt = sha1(uniqid(mt_rand(), true));
+                $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
+                $encryptedPass = call_user_func_array($algorithm, array($salt . $params['password']));
+
+                $user = [
+                    'username'   => $params['email'],
+                    'first_name' => $params['name'],
+                    'second_name'=> $params['familia'],
+                    'middle_name'=> $params['last_name'],
+                    'gender'     => $params['gender'],
+                    'birth_date' => $params['birth_date'],
+                    'email'      => $params['email'],
+                    'phone'      => $params['phone'],
+                    'salt'       => $salt,
+                    'password'   => $encryptedPass,
+//                'photo' => '',
+//                'last_login' => '',
+                    'password_check'=> $rndPasswordCheck,
+                ];
+
+                $newUser = Doctrine::getTable('User')->create($user);
+                $newUser->save();
+
+                $this->getUser()->signIn($newUser, 1);
+
+                $response = array(
+                    'response' => "Успешная регистрация",
+                );
+            } catch (Exception $e) {
+                $response = array(
+                    "error" => $e->getMessage(),
+                );
+            }
+        } else {
+            $response = array(
+                "error" => "Поддерживается только POST запрос.",
             );
         }
 
@@ -126,68 +239,60 @@ class apiActions extends sfActions
         ));
     }
 
-    public function executeApi_register(sfWebRequest $request)
+    public function executeGet_anamnes(sfWebRequest $request)
     {
-        $this->getResponse()->setHttpHeader('Content-type', 'application/json');
-        $this->setLayout('json');
-        $this->setTemplate('json', 'main');
-
-        if ($request->isMethod('post')) {
-            try {
-                $params['name'] = $request->getPostParameter("name");
-                $params['familia'] = $request->getPostParameter("familia");
-                $params['last_name'] = $request->getPostParameter("last_name");
-                $params['gender'] = $request->getPostParameter("gender");
-                $params['birth_date'] = $request->getPostParameter("birth_date");
-                $params['phone'] = $request->getPostParameter("phone");
-                $params['email'] = $request->getPostParameter("email");
-                $params['password'] = $request->getPostParameter("password");
-
-                $checkUser = Doctrine::getTable('User')->findOneBy('email', $params['email']);
-                // Если нашел такого пользователя
-                if ($checkUser) {
-                    return $this->renderText(json_encode(array(
-                        "error" => "Такой пользователь уже существует",
-                    )));
-                }
-
-                $rndPasswordCheck = Page::generateUuid(32);
-                $salt = sha1(uniqid(mt_rand(), true));
-                $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
-                $encryptedPass = call_user_func_array($algorithm, array($salt . $params['password']));
-
-                $user = [
-                    'username'   => $params['email'],
-                    'first_name' => $params['name'],
-                    'second_name'=> $params['familia'],
-                    'middle_name'=> $params['last_name'],
-                    'gender'     => $params['gender'],
-                    'birth_date' => $params['birth_date'],
-                    'email'      => $params['email'],
-                    'phone'      => $params['phone'],
-                    'salt'       => $salt,
-                    'password'   => $encryptedPass,
-//                'photo' => '',
-//                'last_login' => '',
-                    'password_check'=> $rndPasswordCheck,
-                ];
-
-                $newUser = Doctrine::getTable('User')->create($user);
-                $newUser->save();
-                $user = $newUser;
-
-                return $this->renderText(json_encode(array(
-                    'salt'          => $user->get('salt'),
-                )));
-            } catch (Exception $e) {
-                return $this->renderText(json_encode(array(
-                    "error" => $e->getMessage(),
-                )));
-            }
-        } else {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+        if (!$request->isMethod('post'))
+        {
             return $this->renderText(json_encode(array(
                 "error" => "Поддерживается только POST запрос.",
             )));
         }
+        if (!$this->getUser()->isAuthenticated()) {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+
+        $spec_id = $request->getPostParameter('spec_id');
+        if(!$spec_id){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите параметр 'spec_id'"
+            )));
+        }
+
+        if ($this->getUser()->isAuthenticated()){
+            $connect = Doctrine_Manager::getInstance()->getCurrentConnection();
+            $anamnes = $connect->execute("select shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
+                from sheet_history_specialty as shs
+                inner join sheet_history as sh ON sh.id = (select sheet_history_id from sheet_history_specialty as shs where shs.specialty_id = {$spec_id})
+                inner join sheet_history_field as shf ON shf.sheet_history_id = sh.id
+                where shs.sheet_history_id = (select sheet_history_id from sheet_history_specialty as shs where shs.specialty_id = {$spec_id})")
+                ->fetchAll();
+
+            if($anamnes){
+                $response = array(
+                    "response" => $anamnes
+                );
+            } else {
+                $common = $connect->execute("select shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
+                    from sheet_history_field as shf
+                    where shf.sheet_history_id = 1")
+                    ->fetchAll();
+                $response = array(
+                    "common" => "Общий",
+                    "response" => $common
+                );
+            }
+
+        } else {
+            $response = array(
+                "error" => "Для использования метода нужно авторизоваться"
+            );
+        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
     }
 }

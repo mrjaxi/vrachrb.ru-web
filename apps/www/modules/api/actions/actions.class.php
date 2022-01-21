@@ -60,14 +60,14 @@ class apiActions extends sfActions
 
                 $response = array(
                     "first_name" => $usernameDoctrine->get("first_name"),
-                    "second_name" => $usernameDoctrine->get("second_name"),
-                    "middle_name" => $usernameDoctrine->get("middle_name"),
-                    "username" => $usernameDoctrine->get("username"),
-                    "gender" => $usernameDoctrine->get("gender"),
+                    "second_name"=> $usernameDoctrine->get("second_name"),
+                    "middle_name"=> $usernameDoctrine->get("middle_name"),
+                    "username"   => $usernameDoctrine->get("username"),
+                    "gender"     => $usernameDoctrine->get("gender"),
                     "birth_date" => $usernameDoctrine->get("birth_date"),
-                    "email" => $usernameDoctrine->get("email"),
-                    "phone" => $usernameDoctrine->get("phone"),
-                    "photo" => $usernameDoctrine->get("photo"),
+                    "email"      => $usernameDoctrine->get("email"),
+                    "phone"      => $usernameDoctrine->get("phone"),
+                    "photo"      => $usernameDoctrine->get("photo"),
                 );
 
             } else {
@@ -92,14 +92,14 @@ class apiActions extends sfActions
 
         if ($request->isMethod('post')) {
             try {
-                $params['name'] = $request->getPostParameter("name");
-                $params['familia'] = $request->getPostParameter("familia");
+                $params['name']      = $request->getPostParameter("name");
+                $params['familia']   = $request->getPostParameter("familia");
                 $params['last_name'] = $request->getPostParameter("last_name");
-                $params['gender'] = $request->getPostParameter("gender");
-                $params['birth_date'] = $request->getPostParameter("birth_date");
-                $params['phone'] = $request->getPostParameter("phone");
-                $params['email'] = $request->getPostParameter("email");
-                $params['password'] = $request->getPostParameter("password");
+                $params['gender']    = $request->getPostParameter("gender");
+                $params['birth_date']= $request->getPostParameter("birth_date");
+                $params['phone']     = $request->getPostParameter("phone");
+                $params['email']     = $request->getPostParameter("email");
+                $params['password']  = $request->getPostParameter("password");
 
                 $checkUser = Doctrine::getTable('User')->findOneBy('email', $params['email']);
                 // Если нашел такого пользователя
@@ -200,7 +200,6 @@ class apiActions extends sfActions
                 ->select('s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name')
                 ->from('Specialist s')
                 ->leftJoin('s.User u ON u.id = s.user_id')
-                ->limit(10)
                 ->fetchArray();
 
             $response = array(
@@ -262,26 +261,26 @@ class apiActions extends sfActions
         }
 
         if ($this->getUser()->isAuthenticated()){
-            $connect = Doctrine_Manager::getInstance()->getCurrentConnection();
-            $anamnes = $connect->execute("select shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
+            $CurrentConnection = Doctrine_Manager::getInstance()->getCurrentConnection();
+            $anamneses = $CurrentConnection->execute("select shf.id, shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
                 from sheet_history_specialty as shs
                 inner join sheet_history as sh ON sh.id = (select sheet_history_id from sheet_history_specialty as shs where shs.specialty_id = {$spec_id})
                 inner join sheet_history_field as shf ON shf.sheet_history_id = sh.id
                 where shs.sheet_history_id = (select sheet_history_id from sheet_history_specialty as shs where shs.specialty_id = {$spec_id})")
                 ->fetchAll();
 
-            if($anamnes){
+            if($anamneses){
                 $response = array(
-                    "response" => $anamnes
+                    "response" => $this->unserializeAnamneses($anamneses)
                 );
             } else {
-                $common = $connect->execute("select shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
+                $common = $CurrentConnection->execute("select shf.id, shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
                     from sheet_history_field as shf
                     where shf.sheet_history_id = 1")
                     ->fetchAll();
                 $response = array(
                     "common" => "Общий",
-                    "response" => $common
+                    "response" => $this->unserializeAnamneses($common)
                 );
             }
 
@@ -294,5 +293,93 @@ class apiActions extends sfActions
         return $this->renderText(json_encode(
             $response
         ));
+    }
+
+    public function executeAsk_question(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+        if (!$request->isMethod('post'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
+        if (!$this->getUser()->isAuthenticated()) {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+
+        $q_user_id    = $request->getPostParameter('q_user_id');
+        $q_body       = $request->getPostParameter('q_body');
+        $qsh_anamnes  = json_decode($request->getPostParameter('qsh_anamnes'));
+        $q_specialist = $request->getPostParameter('q_specialist');
+        $q_specialty  = $request->getPostParameter('q_specialty');
+//        if(!$spec_id){
+//            return $this->renderText(json_encode(array(
+//                "error" => "Введите параметр 'spec_id'"
+//            )));
+//        }
+
+        $idQuestion = Doctrine_Query::create()
+            ->select('q.id')
+            ->from('Question q')
+            ->orderBy('q.id DESC')
+            ->limit(1)
+            ->fetchArray()[0]["id"];
+
+
+        $value = array(
+            'question_id'            => $idQuestion,
+            'sheet_history_field_id' => '137',
+            'values'                 => '{"choices":["svkljsdjnk"]}'
+        );
+        $this->insertFromTable('QuestionSheetHistory',$value);
+
+//        $values = $this->buildValue($idQuestion, $qsh_anamnes);
+//        for($i = 0; $i < count($values); $i++){
+//            $this->insertFromTable('QuestionSheetHistory',$values[$i]);
+//        }
+//        $this->insertFromTable('QuestionSheetHistory',$values[0]);
+
+        $response = array(
+            "val" => $values[0]
+        );
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
+    public function buildValue($idQuestion, $val){
+        $values = array();
+        for($i = 0; $i < count($val); $i++){
+            $values[$i] = array(
+                'question_id'            => $idQuestion,
+                'sheet_history_field_id' => $val[$i]['sh_field'],
+                'values'                 => $this->clearValues($val[$i])
+            );
+        }
+        return $values;
+    }
+
+    public function clearValues($values){
+        unset($values['sh_field']);
+        return json_encode($values);
+    }
+
+    public function insertFromTable($tableName, array $values){
+        $CurrentConnection = Doctrine_Manager::getInstance()->getCurrentConnection();
+        $Table = Doctrine_Core::getTable($tableName);
+
+        $CurrentConnection->insert($Table,$values);
+    }
+
+    public function unserializeAnamneses($anamneses){
+        for($i = 0;$i < count($anamneses);$i++){
+            $anamneses[$i]["field_options"] = unserialize($anamneses[$i]["field_options"]);
+            $anamneses[$i]["3"] = unserialize($anamneses[$i]["3"]);
+        }
+        return $anamneses;
     }
 }

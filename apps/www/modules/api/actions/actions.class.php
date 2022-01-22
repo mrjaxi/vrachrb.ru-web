@@ -312,14 +312,15 @@ class apiActions extends sfActions
 
         $q_user_id    = $request->getPostParameter('q_user_id');
         $q_body       = $request->getPostParameter('q_body');
-        $qsh_anamnes  = json_decode($request->getPostParameter('qsh_anamnes'));
-        $q_specialist = $request->getPostParameter('q_specialist');
-        $q_specialty  = $request->getPostParameter('q_specialty');
-//        if(!$spec_id){
-//            return $this->renderText(json_encode(array(
-//                "error" => "Введите параметр 'spec_id'"
-//            )));
-//        }
+        // Пример json в qsh_anamnes: [{"sh_field":"137","val":"test"},{"sh_field":"138","val":"test"},{"sh_field":"139","val":"test","file":""},{"sh_field":"140","bool":"Нет","val":""},{"sh_field":"141","bool":"Нет","val":"ТЕКСТ и да нет"},{"sh_field":"142","choices":["список"]},{"sh_field":"143","choices":{"1":"без","2":"выбора"}}]
+        $qsh_anamnes  = json_decode($request->getPostParameter('qsh_anamnes'), true);
+        $q_specialist_id = $request->getPostParameter('q_specialist_id');
+        $q_specialty_id  = $request->getPostParameter('q_specialty_id');
+        if(!$q_user_id || !$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите все параметры: 'q_user_id','q_body','qsh_anamnes','q_specialist_id','q_specialty_id'"
+            )));
+        }
 
         $idQuestion = Doctrine_Query::create()
             ->select('q.id')
@@ -328,36 +329,42 @@ class apiActions extends sfActions
             ->limit(1)
             ->fetchArray()[0]["id"];
 
+        $question = new Question();
+        $question->setUserId($q_user_id)
+            ->setBody($q_body)
+            ->setVkNotice(false)
+            ->save();
 
-        $value = array(
-            'question_id'            => $idQuestion,
-            'sheet_history_field_id' => '137',
-            'values'                 => '{"choices":["svkljsdjnk"]}'
-        );
-        $this->insertFromTable('QuestionSheetHistory',$value);
+        $valuesQSH = $this->buildValueQSH($idQuestion, $qsh_anamnes);
+        for($i = 0;$i < count($valuesQSH);$i++){
+            $this->insertFromTable('QuestionSheetHistory',$valuesQSH[$i]);
+        }
 
-//        $values = $this->buildValue($idQuestion, $qsh_anamnes);
-//        for($i = 0; $i < count($values); $i++){
-//            $this->insertFromTable('QuestionSheetHistory',$values[$i]);
-//        }
-//        $this->insertFromTable('QuestionSheetHistory',$values[0]);
+        $question_specialist = new QuestionSpecialist();
+        $question_specialist->setQuestionId($idQuestion)
+            ->setSpecialistId($q_specialist_id)
+            ->save();
 
-        $response = array(
-            "val" => $values[0]
-        );
+        $question_specialist = new QuestionSpecialty();
+        $question_specialist->setQuestionId($idQuestion)
+            ->setSpecialtyId($q_specialty_id)
+            ->save();
+
 
         return $this->renderText(json_encode(
-            $response
+            $response = array(
+                "val" => 'Вопрос успешно задан'
+            )
         ));
     }
 
-    public function buildValue($idQuestion, $val){
+    public function buildValueQSH($idQuestion, $val){
         $values = array();
         for($i = 0; $i < count($val); $i++){
             $values[$i] = array(
                 'question_id'            => $idQuestion,
                 'sheet_history_field_id' => $val[$i]['sh_field'],
-                'values'                 => $this->clearValues($val[$i])
+                'value'                  => $this->clearValues($val[$i])
             );
         }
         return $values;
@@ -368,18 +375,18 @@ class apiActions extends sfActions
         return json_encode($values);
     }
 
-    public function insertFromTable($tableName, array $values){
-        $CurrentConnection = Doctrine_Manager::getInstance()->getCurrentConnection();
-        $Table = Doctrine_Core::getTable($tableName);
-
-        $CurrentConnection->insert($Table,$values);
-    }
-
     public function unserializeAnamneses($anamneses){
         for($i = 0;$i < count($anamneses);$i++){
             $anamneses[$i]["field_options"] = unserialize($anamneses[$i]["field_options"]);
             $anamneses[$i]["3"] = unserialize($anamneses[$i]["3"]);
         }
         return $anamneses;
+    }
+
+    public function insertFromTable($tableName, array $values){
+        $CurrentConnection = Doctrine_Manager::getInstance()->getCurrentConnection();
+        $Table = Doctrine_Core::getTable($tableName);
+
+        $CurrentConnection->insert($Table,$values);
     }
 }

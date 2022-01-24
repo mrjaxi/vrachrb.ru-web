@@ -46,6 +46,13 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
+        if (!$request->isMethod('post'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
+
         $username = $request->getPostParameter("user");
         $password = $request->getPostParameter("password");
 
@@ -90,62 +97,56 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type', 'application/json');
 
-        if ($request->isMethod('post')) {
-            try {
-                $params['name']      = $request->getPostParameter("name");
-                $params['familia']   = $request->getPostParameter("familia");
-                $params['last_name'] = $request->getPostParameter("last_name");
-                $params['gender']    = $request->getPostParameter("gender");
-                $params['birth_date']= $request->getPostParameter("birth_date");
-                $params['phone']     = $request->getPostParameter("phone");
-                $params['email']     = $request->getPostParameter("email");
-                $params['password']  = $request->getPostParameter("password");
+        if (!$request->isMethod('post'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
 
-                $checkUser = Doctrine::getTable('User')->findOneBy('email', $params['email']);
-                // Если нашел такого пользователя
-                if ($checkUser) {
-                    return $this->renderText(json_encode(array(
-                        "error" => "Такой пользователь уже существует",
-                    )));
-                }
+        try {
+            $params = $request->getPostParameters();
 
-                $rndPasswordCheck = Page::generateUuid(32);
-                $salt = sha1(uniqid(mt_rand(), true));
-                $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
-                $encryptedPass = call_user_func_array($algorithm, array($salt . $params['password']));
+            $checkUser = Doctrine::getTable('User')->findOneBy('email', $params['email']);
+            // Если нашел такого пользователя
+            if ($checkUser) {
+                return $this->renderText(json_encode(array(
+                    "error" => "Такой пользователь уже существует",
+                )));
+            }
 
-                $user = [
-                    'username'   => $params['email'],
-                    'first_name' => $params['name'],
-                    'second_name'=> $params['familia'],
-                    'middle_name'=> $params['last_name'],
-                    'gender'     => $params['gender'],
-                    'birth_date' => $params['birth_date'],
-                    'email'      => $params['email'],
-                    'phone'      => $params['phone'],
-                    'salt'       => $salt,
-                    'password'   => $encryptedPass,
+            $rndPasswordCheck = Page::generateUuid(32);
+            $salt = sha1(uniqid(mt_rand(), true));
+            $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
+            $encryptedPass = call_user_func_array($algorithm, array($salt . $params['password']));
+
+            $user = [
+                'username' => $params['email'],
+                'first_name' => $params['name'],
+                'second_name' => $params['familia'],
+                'middle_name' => $params['last_name'],
+                'gender' => $params['gender'],
+                'birth_date' => $params['birth_date'],
+                'email' => $params['email'],
+                'phone' => $params['phone'],
+                'salt' => $salt,
+                'password' => $encryptedPass,
 //                'photo' => '',
 //                'last_login' => '',
-                    'password_check'=> $rndPasswordCheck,
-                ];
+                'password_check' => $rndPasswordCheck,
+            ];
 
-                $newUser = Doctrine::getTable('User')->create($user);
-                $newUser->save();
+            $newUser = Doctrine::getTable('User')->create($user);
+            $newUser->save();
 
-                $this->getUser()->signIn($newUser, 1);
+            $this->getUser()->signIn($newUser, 1);
 
-                $response = array(
-                    'response' => "Успешная регистрация",
-                );
-            } catch (Exception $e) {
-                $response = array(
-                    "error" => $e->getMessage(),
-                );
-            }
-        } else {
             $response = array(
-                "error" => "Поддерживается только POST запрос.",
+                'response' => "Успешная регистрация",
+            );
+        } catch (Exception $e) {
+            $response = array(
+                "error" => $e->getMessage(),
             );
         }
 
@@ -154,13 +155,31 @@ class apiActions extends sfActions
         ));
     }
 
-    public function executeSendMessage(sfWebRequest $request)
+    public function executeGet_your_questions(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
+        if (!$this->getUser()->isAuthenticated())
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+
+        $myUser = $this->getUser()->getAccount();
+
+        return $this->renderText(json_encode(array(
+            "response" => 'Ваши вопросы'
+        )));
     }
 
-    public function executeGetSpecialistBySpecialtyID(sfWebRequest $request)
+    public function executeSendMessage(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
@@ -177,11 +196,32 @@ class apiActions extends sfActions
                 "error" => "Для использования метода нужно авторизоваться"
             )));
         }
+    }
+
+    public function executeGetSpecialistBySpecialtyID(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
+
+        if (!$this->getUser()->isAuthenticated())
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+
+        $specialtyId = $request->getGetParameter('specialtyId');
 
         $specialists = Doctrine_Query::create()
             ->select("s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
             ->from("Specialist s")
-            ->innerJoin("s.User u ON u.id = s.user_id and s.specialty_id = 10")
+            ->innerJoin("s.User u ON u.id = s.user_id and s.specialty_id = $specialtyId")
             ->fetchArray();
 
         return $this->renderText(json_encode(
@@ -195,6 +235,12 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
         if ($this->getUser()->isAuthenticated()){
             $q = Doctrine_Query::create()
                 ->select('s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name')
@@ -218,10 +264,14 @@ class apiActions extends sfActions
 
     public function executeGetCabinet(sfWebRequest $request)
     {
-//        var_dump($this->getUser()->getAccount()->getUsername());
-
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
         if ($this->getUser()->isAuthenticated()){
             $allSpeciality = Doctrine_Core::getTable('Specialty')->findAll();
             $response = array(
@@ -241,10 +291,10 @@ class apiActions extends sfActions
     public function executeGet_anamnes(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
-        if (!$request->isMethod('post'))
+        if (!$request->isMethod('get'))
         {
             return $this->renderText(json_encode(array(
-                "error" => "Поддерживается только POST запрос.",
+                "error" => "Поддерживается только GET запрос.",
             )));
         }
         if (!$this->getUser()->isAuthenticated()) {
@@ -253,7 +303,7 @@ class apiActions extends sfActions
             )));
         }
 
-        $spec_id = $request->getPostParameter('spec_id');
+        $spec_id = $request->getGetParameter('spec_id');
         if(!$spec_id){
             return $this->renderText(json_encode(array(
                 "error" => "Введите параметр 'spec_id'"
@@ -310,10 +360,10 @@ class apiActions extends sfActions
             )));
         }
 
-        $q_user_id    = $request->getPostParameter('q_user_id');
-        $q_body       = $request->getPostParameter('q_body');
         // Пример json в qsh_anamnes: [{"sh_field":"137","val":"test"},{"sh_field":"138","val":"test"},{"sh_field":"139","val":"test","file":""},{"sh_field":"140","bool":"Нет","val":""},{"sh_field":"141","bool":"Нет","val":"ТЕКСТ и да нет"},{"sh_field":"142","choices":["список"]},{"sh_field":"143","choices":{"1":"без","2":"выбора"}}]
-        $qsh_anamnes  = json_decode($request->getPostParameter('qsh_anamnes'), true);
+        $qsh_anamnes     = json_decode($request->getPostParameter('qsh_anamnes'), true);
+        $q_user_id       = $request->getPostParameter('q_user_id');
+        $q_body          = $request->getPostParameter('q_body');
         $q_specialist_id = $request->getPostParameter('q_specialist_id');
         $q_specialty_id  = $request->getPostParameter('q_specialty_id');
         if(!$q_user_id || !$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id){
@@ -322,18 +372,18 @@ class apiActions extends sfActions
             )));
         }
 
+        $question = new Question();
+        $question->setUserId($q_user_id)
+            ->setBody($q_body)
+            ->setVkNotice(false)
+            ->save();
+
         $idQuestion = Doctrine_Query::create()
             ->select('q.id')
             ->from('Question q')
             ->orderBy('q.id DESC')
             ->limit(1)
             ->fetchArray()[0]["id"];
-
-        $question = new Question();
-        $question->setUserId($q_user_id)
-            ->setBody($q_body)
-            ->setVkNotice(false)
-            ->save();
 
         $valuesQSH = $this->buildValueQSH($idQuestion, $qsh_anamnes);
         for($i = 0;$i < count($valuesQSH);$i++){
@@ -353,7 +403,7 @@ class apiActions extends sfActions
 
         return $this->renderText(json_encode(
             $response = array(
-                "val" => 'Вопрос успешно задан'
+                "response" => 'Вопрос успешно задан'
             )
         ));
     }
@@ -378,7 +428,8 @@ class apiActions extends sfActions
     public function unserializeAnamneses($anamneses){
         for($i = 0;$i < count($anamneses);$i++){
             $anamneses[$i]["field_options"] = unserialize($anamneses[$i]["field_options"]);
-            $anamneses[$i]["3"] = unserialize($anamneses[$i]["3"]);
+            for($j = 0;$j < 6;$j++)
+                unset($anamneses[$i][$j]);
         }
         return $anamneses;
     }
@@ -389,4 +440,5 @@ class apiActions extends sfActions
 
         $CurrentConnection->insert($Table,$values);
     }
+//    var_dump($this->getUser()->getAccount()->getUsername());
 }

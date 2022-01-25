@@ -155,7 +155,7 @@ class apiActions extends sfActions
         ));
     }
 
-    public function executeGet_your_questions(sfWebRequest $request)
+    public function executeGet_user_questions(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
@@ -171,11 +171,53 @@ class apiActions extends sfActions
                 "error" => "Для использования метода нужно авторизоваться"
             )));
         }
+        $myUserId = $this->getUser()->getAccount()->getId();
 
-        $myUser = $this->getUser()->getAccount();
+        $question_user = Doctrine_Query::create()
+            ->select("u.username, uq.id, uq.body, uq.closed_by, qa.*, qs.*, uqs.*, qsu.*")
+            ->from("User u")
+            ->innerJoin("u.Question uq")
+            ->innerJoin("uq.Answer qa")
+            ->innerJoin("uq.Specialists qs")
+            ->innerJoin("qs.User qsu")
+            ->innerJoin("uq.Specialtys uqs")
+            ->where("u.id = $myUserId")
+            ->fetchArray();
 
         return $this->renderText(json_encode(array(
-            "response" => 'Ваши вопросы'
+            "response" => $question_user
+        )));
+    }
+
+    public function executeGet_specialist_questions(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
+        if (!$this->getUser()->isAuthenticated())
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+        $myUserId = $this->getUser()->getAccount()->getId();
+
+        $question_user = Doctrine_Query::create()
+            ->select("s.*, su.*, sq.*")
+            ->from("Specialist s")
+            ->innerJoin("s.User su")
+            ->innerJoin("s.Questions sq")
+            ->innerJoin("sq.Answer sqa")
+            ->where("su.id = $myUserId")
+            ->fetchArray();
+
+        return $this->renderText(json_encode(array(
+            "response" => $question_user
         )));
     }
 
@@ -196,6 +238,10 @@ class apiActions extends sfActions
                 "error" => "Для использования метода нужно авторизоваться"
             )));
         }
+
+        return $this->renderText(json_encode(array(
+            "response" => "message"
+        )));
     }
 
     public function executeGetSpecialistBySpecialtyID(sfWebRequest $request)
@@ -312,22 +358,25 @@ class apiActions extends sfActions
 
         if ($this->getUser()->isAuthenticated()){
             $CurrentConnection = Doctrine_Manager::getInstance()->getCurrentConnection();
-            $anamneses = $CurrentConnection->execute("select shf.id, shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
-                from sheet_history_specialty as shs
-                inner join sheet_history as sh ON sh.id = (select sheet_history_id from sheet_history_specialty as shs where shs.specialty_id = {$spec_id})
-                inner join sheet_history_field as shf ON shf.sheet_history_id = sh.id
-                where shs.sheet_history_id = (select sheet_history_id from sheet_history_specialty as shs where shs.specialty_id = {$spec_id})")
-                ->fetchAll();
+            $anamneses = Doctrine_Query::create()
+                ->select('sh.*, shf.id, shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required')
+                ->from("SheetHistory sh")
+                ->innerJoin("sh.SheetHistorySpecialty shs")
+                ->innerJoin("sh.SheetHistoryField shf")
+                ->where("shs.specialty_id = $spec_id")
+                ->fetchArray();
+            $anamneses = $anamneses[0]["SheetHistoryField"];
 
             if($anamneses){
                 $response = array(
                     "response" => $this->unserializeAnamneses($anamneses)
                 );
             } else {
-                $common = $CurrentConnection->execute("select shf.id, shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required
-                    from sheet_history_field as shf
-                    where shf.sheet_history_id = 1")
-                    ->fetchAll();
+                $common = Doctrine_Query::create()
+                    ->select('shf.id, shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required')
+                    ->from("SheetHistoryField shf")
+                    ->where("shf.sheet_history_id = 1")
+                    ->fetchArray();
                 $response = array(
                     "common" => "Общий",
                     "response" => $this->unserializeAnamneses($common)
@@ -359,16 +408,16 @@ class apiActions extends sfActions
                 "error" => "Для использования метода нужно авторизоваться"
             )));
         }
+        $q_user_id       = $this->getUser()->getAccount()->getId();
 
         // Пример json в qsh_anamnes: [{"sh_field":"137","val":"test"},{"sh_field":"138","val":"test"},{"sh_field":"139","val":"test","file":""},{"sh_field":"140","bool":"Нет","val":""},{"sh_field":"141","bool":"Нет","val":"ТЕКСТ и да нет"},{"sh_field":"142","choices":["список"]},{"sh_field":"143","choices":{"1":"без","2":"выбора"}}]
         $qsh_anamnes     = json_decode($request->getPostParameter('qsh_anamnes'), true);
-        $q_user_id       = $request->getPostParameter('q_user_id');
         $q_body          = $request->getPostParameter('q_body');
         $q_specialist_id = $request->getPostParameter('q_specialist_id');
         $q_specialty_id  = $request->getPostParameter('q_specialty_id');
-        if(!$q_user_id || !$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id){
+        if(!$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id){
             return $this->renderText(json_encode(array(
-                "error" => "Введите все параметры: 'q_user_id','q_body','qsh_anamnes','q_specialist_id','q_specialty_id'"
+                "error" => "Введите все параметры: 'q_body','qsh_anamnes','q_specialist_id','q_specialty_id'"
             )));
         }
 
@@ -428,8 +477,6 @@ class apiActions extends sfActions
     public function unserializeAnamneses($anamneses){
         for($i = 0;$i < count($anamneses);$i++){
             $anamneses[$i]["field_options"] = unserialize($anamneses[$i]["field_options"]);
-            for($j = 0;$j < 6;$j++)
-                unset($anamneses[$i][$j]);
         }
         return $anamneses;
     }
@@ -439,6 +486,18 @@ class apiActions extends sfActions
         $Table = Doctrine_Core::getTable($tableName);
 
         $CurrentConnection->insert($Table,$values);
+    }
+
+    public function executeTest(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+
+        return $this->renderText(json_encode(
+            $response = array(
+                "test" => "test"
+            )
+        ));
     }
 //    var_dump($this->getUser()->getAccount()->getUsername());
 }

@@ -140,6 +140,18 @@ class apiActions extends sfActions
             $newUser->save();
 
             $this->getUser()->signIn($newUser, 1);
+            // Принятие соглашений
+            $agreements = Doctrine_Query::create()
+                ->select('a.id')
+                ->from('Agreement a')
+                ->fetchArray();
+
+            for($i = 0;$i < count($agreements);$i++){
+                $a_complete = new AgreementComplete();
+                $a_complete->setUserId($newUser->get('id'))
+                    ->setAgreementId($agreements[$i]['id'])
+                    ->save();
+            }
 
             $response = array(
                 'response' => "Успешная регистрация",
@@ -349,6 +361,35 @@ class apiActions extends sfActions
         ));
     }
 
+    public function executeGetAgreements(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
+
+        $agreements = Doctrine_Query::create()
+            ->select('a.id, a.description, a.in_documentation')
+            ->from('Agreement a')
+            ->fetchArray();
+
+        for($i = 0;$i < count($agreements);$i++){
+            if($agreements[$i]['in_documentation'] == true){
+                $agreements[$i]['url'] = "http://vrachrb.ru/agreement/{$agreements[$i]["id"]}/";
+            }
+        }
+
+        return $this->renderText(json_encode(
+            $response = array(
+                "test" => $agreements
+            )
+        ));
+    }
+
     public function executeGet_anamnes(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
@@ -528,10 +569,9 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
-
         return $this->renderText(json_encode(
             $response = array(
-                "test" => "test"
+                "test" => $agreements
             )
         ));
     }

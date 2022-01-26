@@ -239,8 +239,23 @@ class apiActions extends sfActions
             )));
         }
 
+        $user_id = $request->getPostParameter('user_id');
+        $question_id = $request->getPostParameter('question_id');
+        $body = $request->getPostParameter('body');
+        if(!$user_id || !$question_id || !$body){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите параметры 'user_id', 'question_id', 'body'"
+            )));
+        }
+
+        $answer = new Answer();
+        $answer->setUserId($user_id)
+            ->setQuestionId($question_id)
+            ->setBody($body)
+            ->save();
+
         return $this->renderText(json_encode(array(
-            "response" => "message"
+            "response" => "Ответ успешно добавлен"
         )));
     }
 

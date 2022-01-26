@@ -430,6 +430,8 @@ class apiActions extends sfActions
         $q_body          = $request->getPostParameter('q_body');
         $q_specialist_id = $request->getPostParameter('q_specialist_id');
         $q_specialty_id  = $request->getPostParameter('q_specialty_id');
+        $user_about      = json_decode($request->getPostParameter('user_about'), true);
+
         if(!$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id){
             return $this->renderText(json_encode(array(
                 "error" => "Введите все параметры: 'q_body','qsh_anamnes','q_specialist_id','q_specialty_id'"
@@ -439,8 +441,27 @@ class apiActions extends sfActions
         $question = new Question();
         $question->setUserId($q_user_id)
             ->setBody($q_body)
-            ->setVkNotice(false)
-            ->save();
+            ->setVkNotice(false);
+        if($user_about){
+            $username = implode(' ', array($user_about["first_name"], $user_about["second_name"], $user_about["middle_name"]));
+            $checkUser = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
+            if(!$checkUser) {
+                $user = [
+                    'username' => $username,
+                    'first_name' => $user_about["first_name"],
+                    'second_name' => $user_about["second_name"],
+                    'middle_name' => $user_about["middle_name"],
+                    'gender' => $user_about['gender'],
+                    'is_active' => 0
+                ];
+                $newUser = Doctrine::getTable('User')->create($user);
+                $newUser->save();
+                $question->setUserAboutId($newUser->get('id'));
+            } else {
+                $question->setUserAboutId($checkUser->get('id'));
+            }
+        }
+        $question->save();
 
         $idQuestion = Doctrine_Query::create()
             ->select('q.id')

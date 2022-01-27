@@ -220,12 +220,11 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            ->select("s.*, su.*, sq.*")
+            ->select("s.*, sq.*, sqa.*")// sqs.*, sqsq.*, sqsqa.*, qsy.*, qsyq.*, qsyqa.*")
             ->from("Specialist s")
-            ->innerJoin("s.User su")
             ->innerJoin("s.Questions sq")
-            ->innerJoin("sq.Answer sqa")
-            ->where("su.id = $myUserId")
+            ->leftJoin("sq.Answer sqa")
+            ->where("s.user_id = $myUserId")
             ->fetchArray();
 
         return $this->renderText(json_encode(array(
@@ -250,8 +249,8 @@ class apiActions extends sfActions
                 "error" => "Для использования метода нужно авторизоваться"
             )));
         }
+        $user_id = $this->getUser()->getAccount()->getId();
 
-        $user_id = $request->getPostParameter('user_id');
         $question_id = $request->getPostParameter('question_id');
         $body = $request->getPostParameter('body');
         if(!$user_id || !$question_id || !$body){
@@ -264,6 +263,7 @@ class apiActions extends sfActions
         $answer->setUserId($user_id)
             ->setQuestionId($question_id)
             ->setBody($body)
+            ->setType("")
             ->save();
 
         return $this->renderText(json_encode(array(
@@ -304,7 +304,7 @@ class apiActions extends sfActions
         ));
     }
 
-    public function executeSpecialist(sfWebRequest $request)
+    public function executeGetSpecialists(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
@@ -497,6 +497,10 @@ class apiActions extends sfActions
                 ];
                 $newUser = Doctrine::getTable('User')->create($user);
                 $newUser->save();
+                $afu = new Attached_family_users();
+                $afu->setUserId($q_user_id)
+                    ->setUserAboutId($newUser->get('id'))
+                    ->save();
                 $question->setUserAboutId($newUser->get('id'));
             } else {
                 $question->setUserAboutId($checkUser->get('id'));

@@ -220,10 +220,11 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            ->select("s.*, sq.*, sqa.*")// sqs.*, sqsq.*, sqsqa.*, qsy.*, qsyq.*, qsyqa.*")
+            ->select("s.*, sq.*, sqa.*, squ.*")
             ->from("Specialist s")
             ->innerJoin("s.Questions sq")
             ->leftJoin("sq.Answer sqa")
+            ->innerJoin("sq.User squ")
             ->where("s.user_id = $myUserId")
             ->fetchArray();
 
@@ -575,7 +576,7 @@ class apiActions extends sfActions
 
         return $this->renderText(json_encode(
             $response = array(
-                "test" => $agreements
+                "test" => 'test'
             )
         ));
     }

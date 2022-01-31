@@ -310,7 +310,7 @@ class apiActions extends sfActions
         $specialtyId = $request->getGetParameter('specialtyId');
 
         $specialists = Doctrine_Query::create()
-            ->select("s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
+            ->select("s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
             ->from("Specialist s")
             ->innerJoin("s.User u ON u.id = s.user_id and s.specialty_id = $specialtyId")
             ->fetchArray();

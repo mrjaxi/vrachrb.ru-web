@@ -8,11 +8,11 @@ class apiActions extends sfActions
         if ($this->getUser()->isAuthenticated())
         {
             $response = array(
-                "response" => "Вы авторизованы"
+                "response" => true,
             );
         } else {
             $response = array(
-                "response" => "Вы не авторизованы"
+                "response" => false,
             );
         }
 
@@ -53,8 +53,14 @@ class apiActions extends sfActions
             )));
         }
 
-        $username = $request->getPostParameter("user");
-        $password = $request->getPostParameter("password");
+        $data = $this->getPostData();
+        if($data) {
+            $username = $data["user"];
+            $password = $data["password"];
+        } else {
+            $username = $request->getPostParameter("user");
+            $password = $request->getPostParameter("password");
+        }
 
         $usernameDoctrine = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
 
@@ -66,6 +72,7 @@ class apiActions extends sfActions
                 $this->getUser()->signIn($usernameDoctrine, 1);
 
                 $response = array(
+                    "auth"       => true,
                     "first_name" => $usernameDoctrine->get("first_name"),
                     "second_name"=> $usernameDoctrine->get("second_name"),
                     "middle_name"=> $usernameDoctrine->get("middle_name"),
@@ -105,7 +112,10 @@ class apiActions extends sfActions
         }
 
         try {
-            $params = $request->getPostParameters();
+            $params = $this->getPostData();
+            if(!$params){
+                $params = $request->getPostParameters();
+            }
 
             $checkUser = Doctrine::getTable('User')->findOneBy('email', $params['email']);
             // Если нашел такого пользователя
@@ -189,10 +199,10 @@ class apiActions extends sfActions
             ->select("u.username, uq.id, uq.body, uq.closed_by, qa.*, qs.*, uqs.*, qsu.*")
             ->from("User u")
             ->innerJoin("u.Question uq")
-            ->innerJoin("uq.Answer qa")
+            ->leftJoin("uq.Answer qa")
+            ->innerJoin("uq.Specialtys uqs")
             ->innerJoin("uq.Specialists qs")
             ->innerJoin("qs.User qsu")
-            ->innerJoin("uq.Specialtys uqs")
             ->where("u.id = $myUserId")
             ->fetchArray();
 
@@ -252,11 +262,18 @@ class apiActions extends sfActions
         }
         $user_id = $this->getUser()->getAccount()->getId();
 
-        $question_id = $request->getPostParameter('question_id');
-        $body = $request->getPostParameter('body');
+        $data = $this->getPostData();
+        if($data){
+            $question_id = $data['question_id'];
+            $body        = $data['body'];
+        } else {
+            $question_id = $request->getPostParameter('question_id');
+            $body        = $request->getPostParameter('body');
+        }
+
         if(!$user_id || !$question_id || !$body){
             return $this->renderText(json_encode(array(
-                "error" => "Введите параметры 'user_id', 'question_id', 'body'"
+                "error" => "Введите параметры 'question_id', 'body'"
             )));
         }
 
@@ -317,7 +334,7 @@ class apiActions extends sfActions
         }
         if ($this->getUser()->isAuthenticated()){
             $q = Doctrine_Query::create()
-                ->select('s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name')
+                ->select('s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name')
                 ->from('Specialist s')
                 ->leftJoin('s.User u ON u.id = s.user_id')
                 ->fetchArray();
@@ -405,7 +422,8 @@ class apiActions extends sfActions
                 "error" => "Для использования метода нужно авторизоваться"
             )));
         }
-
+//        $data = json_decode(file_get_contents('php://input'), true);
+//        $spec_id = $data["spec_id"];
         $spec_id = $request->getGetParameter('spec_id');
         if(!$spec_id){
             return $this->renderText(json_encode(array(
@@ -467,12 +485,21 @@ class apiActions extends sfActions
         }
         $q_user_id       = $this->getUser()->getAccount()->getId();
 
-        // Пример json в qsh_anamnes: [{"sh_field":"137","val":"test"},{"sh_field":"138","val":"test"},{"sh_field":"139","val":"test","file":""},{"sh_field":"140","bool":"Нет","val":""},{"sh_field":"141","bool":"Нет","val":"ТЕКСТ и да нет"},{"sh_field":"142","choices":["список"]},{"sh_field":"143","choices":{"1":"без","2":"выбора"}}]
-        $qsh_anamnes     = json_decode($request->getPostParameter('qsh_anamnes'), true);
-        $q_body          = $request->getPostParameter('q_body');
-        $q_specialist_id = $request->getPostParameter('q_specialist_id');
-        $q_specialty_id  = $request->getPostParameter('q_specialty_id');
-        $user_about      = json_decode($request->getPostParameter('user_about'), true);
+        $data = $this->getPostData();
+        if($data) {
+            $qsh_anamnes     = json_decode($data['qsh_anamnes'], true);
+            $q_body          = $data['q_body'];
+            $q_specialist_id = $data['q_specialist_id'];
+            $q_specialty_id  = $data['q_specialty_id'];
+            $user_about      = json_decode($data['user_about'], true);
+        } else {
+            // Пример json в qsh_anamnes: [{"sh_field":"137","val":"test"},{"sh_field":"138","val":"test"},{"sh_field":"139","val":"test","file":""},{"sh_field":"140","bool":"Нет","val":""},{"sh_field":"141","bool":"Нет","val":"ТЕКСТ и да нет"},{"sh_field":"142","choices":["список"]},{"sh_field":"143","choices":{"1":"без","2":"выбора"}}]
+            $qsh_anamnes     = json_decode($request->getPostParameter('qsh_anamnes'), true);
+            $q_body          = $request->getPostParameter('q_body');
+            $q_specialist_id = $request->getPostParameter('q_specialist_id');
+            $q_specialty_id  = $request->getPostParameter('q_specialty_id');
+            $user_about      = json_decode($request->getPostParameter('user_about'), true);
+        }
 
         if(!$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id){
             return $this->renderText(json_encode(array(
@@ -553,6 +580,7 @@ class apiActions extends sfActions
 
     public function clearValues($values){
         unset($values['sh_field']);
+        unset($values['isRequired']);
         return json_encode($values);
     }
 
@@ -568,6 +596,10 @@ class apiActions extends sfActions
         $Table = Doctrine_Core::getTable($tableName);
 
         $CurrentConnection->insert($Table,$values);
+    }
+
+    public function getPostData(){
+        return json_decode(file_get_contents('php://input'), true);
     }
 
     public function executeTest(sfWebRequest $request)

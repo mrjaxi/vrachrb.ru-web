@@ -196,7 +196,8 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            ->select("u.username, uq.id, uq.body, uq.closed_by, qa.*, qs.*, uqs.*, qsu.*")
+            ->select("u.username, uq.id, uq.body, uq.closed_by, qa.id, qa.user_id, qa.question_id, qa.body, qa.created_at,
+                    uqs.title, qs.id, qs.user_id as specialist_id, qsu.first_name, qsu.second_name, qsu.middle_name")
             ->from("User u")
             ->innerJoin("u.Question uq")
             ->leftJoin("uq.Answer qa")

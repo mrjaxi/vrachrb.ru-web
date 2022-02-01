@@ -470,6 +470,45 @@ class apiActions extends sfActions
         ));
     }
 
+    public function executeRecover_password(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+        if ($request->isMethod('post')) {
+            $data = $this->getPostData();
+            if($data)
+                $email = $data["email"];
+            else
+                $email = $request->getPostParameter('email');
+
+            if ($email != '') {
+                $user = Doctrine::getTable('User')->findOneByEmail($email);
+                if ($user) {
+                    if ($user->getIsActive() == 1) {
+                        $sha = ProjectUlils::generateUuid();
+
+                        $user->setPasswordCheck($sha);
+                        $user->save();
+
+                        $message = Swift_Message::newInstance()
+                            ->setFrom('noreply@vrachrb.ru') //. str_replace('www.', '', $request->getHost()))
+                            ->setContentType('text/html; charset=UTF-8')
+                            ->setTo($user->getEmail())
+                            ->setSubject('Восстановление пароля на сайте ' . $request->getHost())
+                            ->setBody($this->getPartial('user/recover_password', array('param' => array('password_check' => $sha, 'email_sha' => substr(sha1($user->getEmail()), 0, 20)))));
+
+                        $this->getMailer()->send($message);
+
+                        $response = array("response" => "На указанный вами адрес отправлено письмо для восстановления пароля");
+                    } else $response = array("error" => "Пользователь не активен");
+                } else $response = array("error" => "Пользователя с таким email нет");
+            } else $response = array("error" => "email пустой");
+        } else $response = array("error" => "Поддерживается только POST запрос");
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
     public function executeAsk_question(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');

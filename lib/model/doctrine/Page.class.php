@@ -79,17 +79,17 @@ class Page extends BasePage
 
   static function watermarkAdd($image_src)
   {
-    $image = new Imagick($image_src);
-    $overlay = new Imagick(sfConfig::get('sf_web_dir') . '/i/watermark_small.png');
+//    $image = new Imagick($image_src);
+//    $overlay = new Imagick(sfConfig::get('sf_web_dir') . '/i/watermark_small.png');
     $image_size = getimagesize($image_src);
     for($item = 0; $item < $image_size[0] / 150; $item ++)
     {
       for($i = 0; $i < $image_size[1] / 150; $i ++)
       {
-        $image->compositeimage($overlay, Imagick::COMPOSITE_DEFAULT, $item * 150, $i * 150 + ($item % 2 == 0 ? 0 : 150));
+//        $image->compositeimage($overlay, Imagick::COMPOSITE_DEFAULT, $item * 150, $i * 150 + ($item % 2 == 0 ? 0 : 150));
       }
     }
-    $image->writeImage($image_src);
+//    $image->writeImage($image_src);
   }
 
   static function noticeAdd($who, $type, $inner_id, $event, $csrf = false, $user_id = false)
@@ -678,6 +678,7 @@ class Page extends BasePage
               foreach($cfg_sizes as $sk => $sv)
               {
                 $copy = false;
+                  $copy = true;
                 if($sv['thumbstyle'] == 'scale')
                 {
                   if($orig_is[0] < $sv['width'] && $orig_is[1] < $sv['height'])
@@ -708,7 +709,7 @@ class Page extends BasePage
                 if($sv['watermark'])
                 {
                   $image_src = sfConfig::get('sf_upload_dir') . '/i/' . Page::replaceImageSize($filename, $sk);
-                  Page::watermarkAdd($image_src);
+//                  Page::watermarkAdd($image_src);
                 }
                 $is = getimagesize($dest_file . '-' . $sk . $ext);
                 if(!$prew)

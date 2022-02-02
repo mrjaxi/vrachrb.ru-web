@@ -205,7 +205,42 @@ class apiActions extends sfActions
             ->innerJoin("uq.Specialists qs")
             ->innerJoin("qs.User qsu")
             ->where("u.id = $myUserId")
+            ->orderBy("qa.id", 'DESC')
             ->fetchArray();
+
+
+        return $this->renderText(json_encode(array(
+            "response" => $question_user
+        )));
+    }
+
+    public function executeGet_answers_by_questionid(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
+        if (!$this->getUser()->isAuthenticated())
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+        $myUserId = $this->getUser()->getAccount()->getId();
+
+        $questionId = $request->getGetParameter("question_id");
+
+        $question_user = Doctrine_Query::create()
+            ->select("q.*, qa.*")
+            ->from("Question q")
+            ->leftJoin("q.Answer qa")
+            ->where("q.id = $questionId")
+            ->fetchArray();
+
 
         return $this->renderText(json_encode(array(
             "response" => $question_user

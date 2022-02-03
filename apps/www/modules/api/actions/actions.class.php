@@ -196,7 +196,8 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            ->select("u.username, uq.id, uq.body, uq.closed_by, qa.id, qa.user_id, qa.question_id, qa.body, qa.created_at,
+            // qa.id, qa.user_id, qa.question_id, qa.body, qa.created_at,
+            ->select("u.username, uq.id, uq.body, uq.updated_at, uq.created_at, uq.user_id, uq.closed_by,
                     uqs.title, qs.id, qs.user_id as specialist_id, qsu.first_name, qsu.second_name, qsu.middle_name")
             ->from("User u")
             ->innerJoin("u.Question uq")
@@ -205,7 +206,7 @@ class apiActions extends sfActions
             ->innerJoin("uq.Specialists qs")
             ->innerJoin("qs.User qsu")
             ->where("u.id = $myUserId")
-            ->orderBy("qa.id", 'DESC')
+            ->orderBy("uq.id DESC")
             ->fetchArray();
 
 
@@ -235,10 +236,11 @@ class apiActions extends sfActions
         $questionId = $request->getGetParameter("question_id");
 
         $question_user = Doctrine_Query::create()
-            ->select("q.*, qa.*")
+            ->select("q.id, q.user_id, q.is_anonymous, q.body, q.closed_by, q.created_at, qa.user_id, qa.body, qa.attachment, qa.created_at")
             ->from("Question q")
             ->leftJoin("q.Answer qa")
             ->where("q.id = $questionId")
+            ->orderBy("qa.created_at DESC")
             ->fetchArray();
 
 

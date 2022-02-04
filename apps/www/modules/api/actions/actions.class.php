@@ -209,6 +209,11 @@ class apiActions extends sfActions
             ->orderBy("uq.id DESC")
             ->fetchArray();
 
+        if(!$question_user){
+            return $this->renderText(json_encode(array(
+                "error" => "Нет чатов"
+            )));
+        }
 
         return $this->renderText(json_encode(array(
             "response" => $question_user

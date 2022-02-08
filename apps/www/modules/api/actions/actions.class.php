@@ -224,6 +224,38 @@ class apiActions extends sfActions
         )));
     }
 
+    public function executeGet_specialist_questions(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$request->isMethod('get'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только GET запрос.",
+            )));
+        }
+        if (!$this->getUser()->isAuthenticated())
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+        $myUserId = $this->getUser()->getAccount()->getId();
+
+        $question_user = Doctrine_Query::create()
+            ->select("s.*, sq.*, sqa.*, squ.*")
+            ->from("Specialist s")
+            ->innerJoin("s.Questions sq")
+            ->leftJoin("sq.Answer sqa")
+            ->innerJoin("sq.User squ")
+            ->where("s.user_id = $myUserId")
+            ->fetchArray();
+
+        return $this->renderText(json_encode(array(
+            "response" => $question_user
+        )));
+    }
+
     public function executeGet_answers_by_questionid(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
@@ -252,38 +284,6 @@ class apiActions extends sfActions
             ->orderBy("qa.created_at DESC")
             ->fetchArray();
 
-
-        return $this->renderText(json_encode(array(
-            "response" => $question_user
-        )));
-    }
-
-    public function executeGet_specialist_questions(sfWebRequest $request)
-    {
-        $this->getResponse()->setHttpHeader('Content-type','application/json');
-
-        if (!$request->isMethod('get'))
-        {
-            return $this->renderText(json_encode(array(
-                "error" => "Поддерживается только GET запрос.",
-            )));
-        }
-        if (!$this->getUser()->isAuthenticated())
-        {
-            return $this->renderText(json_encode(array(
-                "error" => "Для использования метода нужно авторизоваться"
-            )));
-        }
-        $myUserId = $this->getUser()->getAccount()->getId();
-
-        $question_user = Doctrine_Query::create()
-            ->select("s.*, sq.*, sqa.*, squ.*")
-            ->from("Specialist s")
-            ->innerJoin("s.Questions sq")
-            ->leftJoin("sq.Answer sqa")
-            ->innerJoin("sq.User squ")
-            ->where("s.user_id = $myUserId")
-            ->fetchArray();
 
         return $this->renderText(json_encode(array(
             "response" => $question_user

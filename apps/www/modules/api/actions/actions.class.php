@@ -243,13 +243,11 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            //
-            ->select("s.user_id, s.specialty_id, uq.id, uq.body, uq.updated_at, 
-            uq.created_at, uq.user_id, uq.closed_by, qsu.first_name, qsu.second_name, qsu.middle_name")
+            ->select("s.*, sq.*, sqa.*, squ.*")
             ->from("Specialist s")
-            ->innerJoin("s.Questions uq")
-            ->leftJoin("uq.Answer sqa")
-            ->innerJoin("uq.User qsu")
+            ->innerJoin("s.Questions sq")
+            ->leftJoin("sq.Answer sqa")
+            ->innerJoin("sq.User squ")
             ->where("s.user_id = $myUserId")
             ->fetchArray();
 

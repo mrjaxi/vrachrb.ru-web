@@ -364,7 +364,7 @@ class apiActions extends sfActions
         $specialtyId = $request->getGetParameter('specialtyId');
 
         $specialists = Doctrine_Query::create()
-            ->select("s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
+            ->select('s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name, u.photo')
             ->from("Specialist s")
             ->innerJoin("s.User u ON u.id = s.user_id and s.specialty_id = $specialtyId")
             ->fetchArray();
@@ -490,6 +490,7 @@ class apiActions extends sfActions
             ->innerJoin("sh.SheetHistorySpecialty shs")
             ->innerJoin("sh.SheetHistoryField shf")
             ->where("shs.specialty_id = $spec_id")
+            ->orderBy("shf.order_field ASC")
             ->fetchArray();
         $anamneses = $anamneses[0]["SheetHistoryField"];
 
@@ -502,6 +503,7 @@ class apiActions extends sfActions
                 ->select('shf.id, shf.title, shf.field_type, shf.field_options, shf.order_field, shf.is_required')
                 ->from("SheetHistoryField shf")
                 ->where("shf.sheet_history_id = 1")
+                ->orderBy("shf.order_field ASC")
                 ->fetchArray();
             $response = array(
                 "common" => "Общий",

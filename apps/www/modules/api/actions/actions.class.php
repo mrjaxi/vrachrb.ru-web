@@ -200,12 +200,10 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            // qa.id, qa.user_id, qa.question_id, qa.body, qa.created_at,
             ->select("u.username, uq.id, uq.body, uq.updated_at, uq.created_at, uq.user_id, uq.closed_by,
                     uqs.title, qs.id, qs.user_id as specialist_id, qsu.first_name, qsu.second_name, qsu.middle_name")
             ->from("User u")
             ->innerJoin("u.Question uq")
-            ->leftJoin("uq.Answer qa")
             ->innerJoin("uq.Specialtys uqs")
             ->innerJoin("uq.Specialists qs")
             ->innerJoin("qs.User qsu")
@@ -243,13 +241,21 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            ->select("s.*, sq.*, sqa.*, squ.*")
+            ->select("s.user_id,
+                sq.body, sq.user_id, sq.closed_by, sq.updated_at, sq.created_at,
+                squ.first_name, squ.second_name, squ.middle_name")
             ->from("Specialist s")
             ->innerJoin("s.Questions sq")
-            ->leftJoin("sq.Answer sqa")
             ->innerJoin("sq.User squ")
             ->where("s.user_id = $myUserId")
+            ->orderBy("sq.id DESC")
             ->fetchArray();
+
+        if(!$question_user){
+            return $this->renderText(json_encode(array(
+                "error" => "Нет чатов"
+            )));
+        }
 
         return $this->renderText(json_encode(array(
             "response" => $question_user
@@ -277,13 +283,14 @@ class apiActions extends sfActions
         $questionId = $request->getGetParameter("question_id");
 
         $question_user = Doctrine_Query::create()
-            ->select("q.id, q.user_id, q.is_anonymous, q.body, q.closed_by, q.created_at, qa.user_id, qa.body, qa.attachment, qa.created_at")
+            ->select("q.id, q.user_id, q.is_anonymous, q.body, q.closed_by, q.created_at, 
+            qa.user_id, qa.body, qa.attachment, qa.created_at")
             ->from("Question q")
             ->leftJoin("q.Answer qa")
             ->where("q.id = $questionId")
             ->orderBy("qa.created_at DESC")
             ->fetchArray();
-
+        $question_user[0]['my_id'] = $myUserId;
 
         return $this->renderText(json_encode(array(
             "response" => $question_user

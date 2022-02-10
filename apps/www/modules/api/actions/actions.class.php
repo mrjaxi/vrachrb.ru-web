@@ -320,14 +320,22 @@ class apiActions extends sfActions
         if($data){
             $question_id = $data['question_id'];
             $body        = $data['body'];
+            if($data['attachment'])
+                $attachment  = $data['attachment'];
+            else
+                $attachment = "";
         } else {
             $question_id = $request->getPostParameter('question_id');
             $body        = $request->getPostParameter('body');
+            if($request->getPostParameter('attachment'))
+                $attachment = $request->getPostParameter('attachment');
+            else
+                $attachment = "";
         }
 
         if(!$user_id || !$question_id || !$body){
             return $this->renderText(json_encode(array(
-                "error" => "Введите параметры 'question_id', 'body'"
+                "error" => "Введите параметры 'question_id', 'body', при желании 'attachment'"
             )));
         }
 
@@ -336,6 +344,7 @@ class apiActions extends sfActions
             ->setQuestionId($question_id)
             ->setBody($body)
             ->setType("")
+            ->setAttachment($attachment)
             ->save();
 
         return $this->renderText(json_encode(array(

@@ -238,7 +238,7 @@ class apiActions extends sfActions
         $question_user = Doctrine_Query::create()
             ->select("s.user_id,
                 sq.body, sq.user_id, sq.closed_by, sq.updated_at, sq.created_at, sq.is_anonymous,
-                squ.first_name, squ.second_name, squ.middle_name")
+                squ.first_name, squ.second_name, squ.middle_name, squ.photo")
             ->from("Specialist s")
             ->innerJoin("s.Questions sq")
             ->innerJoin("sq.User squ")

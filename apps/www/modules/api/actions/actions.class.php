@@ -607,10 +607,15 @@ class apiActions extends sfActions
             ->orderBy("q.closing_date DESC")
             ->fetchArray();
 
-
-        $response = array(
-            "response" => $patient_card
-        );
+        if(!$patient_card){
+            $response = array(
+                "error" => "Нет карты"
+            );
+        } else {
+            $response = array(
+                "response" => $patient_card
+            );
+        }
 
         return $this->renderText(json_encode(
             $response

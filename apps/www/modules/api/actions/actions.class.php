@@ -68,15 +68,10 @@ class apiActions extends sfActions
             $encrypted = call_user_func_array($algorithm, array($usernameDoctrine->get("salt") . $password));
 
             if ($encrypted == $usernameDoctrine->get("password")){
-                $isSpecialist = Doctrine_Query::create()
-                    ->select("s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
-                    ->from("Specialist s")
-                    ->where("s.user_id = {$usernameDoctrine->get("id")}")
-                    ->fetchArray();
                 $this->getUser()->signIn($usernameDoctrine, 1);
                 $response = array(
                     "auth"         => true,
-                    "isSpecialist" => ($isSpecialist != []),
+                    "isSpecialist" => $this->isSpecialist($usernameDoctrine->get("id")),
                     "first_name"   => $usernameDoctrine->get("first_name"),
                     "second_name"  => $usernameDoctrine->get("second_name"),
                     "middle_name"  => $usernameDoctrine->get("middle_name"),
@@ -201,7 +196,7 @@ class apiActions extends sfActions
 
         $question_user = Doctrine_Query::create()
             ->select("u.username, uq.id, uq.body, uq.updated_at, uq.created_at, uq.user_id, uq.closed_by, uq.is_anonymous,
-                    uqs.title, qs.id, qs.user_id as specialist_id, qsu.first_name, qsu.second_name, qsu.middle_name")
+                    uqs.title, qs.id, qs.user_id as specialist_id, qsu.first_name, qsu.second_name, qsu.middle_name, qsu.photo")
             ->from("User u")
             ->innerJoin("u.Question uq")
             ->innerJoin("uq.Specialtys uqs")
@@ -346,6 +341,19 @@ class apiActions extends sfActions
             ->setType("")
             ->setAttachment($attachment)
             ->save();
+
+        $question = Doctrine::getTable('Question')->findOneBy("id", $question_id);
+        $isSpecialist = $this->isSpecialist($user_id);
+
+        if(!$question["approved"] && $isSpecialist){
+            $question["approved"] = true;
+            try {
+                $question->save();
+            } catch (Exception $e) {
+                var_dump($e->getMessage());
+            }
+        }
+
 
         return $this->renderText(json_encode(array(
             "response" => "Ответ успешно добавлен"
@@ -594,7 +602,7 @@ class apiActions extends sfActions
             ->innerJoin("q.Specialists s")
             ->innerJoin("s.Specialty sp")
             ->innerJoin("s.User u")
-            ->where("q.user_id = " . $request->getParameter('id') . " AND q.closed_by != ''")
+            ->where("q.user_id = " . $user_id . " AND q.closed_by != ''")
             ->addSelect(" (SELECT CONCAT_WS(':division:', a.body, a.user_id) FROM answer a WHERE a.question_id = q.id LIMIT 1 ORDER BY a.id DESC) AS last_answer")
             ->orderBy("q.closing_date DESC")
             ->fetchArray();
@@ -648,6 +656,48 @@ class apiActions extends sfActions
         ));
     }
 
+    public function executeClose_question(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+        if (!$request->isMethod('post'))
+        {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
+        if (!$this->getUser()->isAuthenticated()) {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+        $user_id = $this->getUser()->getAccount()->getId();
+        if(!$this->isSpecialist($user_id)){
+            return $this->renderText(json_encode(array(
+                "error" => "Вы не специалист"
+            )));
+        }
+
+        $data = $this->getPostData();
+        if($data) {
+            $question_id = json_decode($data['question_id'], true);
+        } else {
+            $question_id = $request->getPostParameter('question_id');
+        }
+
+        $question = Doctrine::getTable('Question')->findOneById($question_id);
+        $question
+            ->setClosedBy($this->getUser()->getAccount()->getId())
+            ->setClosingDate(date('Y-m-d' . ' ' . 'H:i:s'))
+            ->save();
+
+
+        return $this->renderText(json_encode(
+            $response = array(
+                "response" => 'Вопрос успешно закрыт'
+            )
+        ));
+    }
+
     public function executeAsk_question(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
@@ -662,7 +712,7 @@ class apiActions extends sfActions
                 "error" => "Для использования метода нужно авторизоваться"
             )));
         }
-        $q_user_id       = $this->getUser()->getAccount()->getId();
+        $q_user_id = $this->getUser()->getAccount()->getId();
 
         $data = $this->getPostData();
         if($data) {
@@ -777,6 +827,15 @@ class apiActions extends sfActions
         $CurrentConnection->insert($Table,$values);
     }
 
+    public function isSpecialist($user_id){
+        $isSpecialist = Doctrine_Query::create()
+            ->select("s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
+            ->from("Specialist s")
+            ->where("s.user_id = {$user_id}")
+            ->fetchArray();
+        return ($isSpecialist != []);
+    }
+
     public function getPostData(){
         return json_decode(file_get_contents('php://input'), true);
     }
@@ -785,9 +844,22 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
+        $question = Doctrine::getTable('Question')->findOneBy("id", "9");
+        $question["approved"] = false;
+        $question->save();
+//        if(!$question["approved"]){
+//            $question["approved"] = true;
+//            try {
+//                var_dump("Сохранился");
+//                $question->save();
+//            } catch (Exception $e) {
+//                var_dump($e->getMessage());
+//            }
+//        }
+
         return $this->renderText(json_encode(
             $response = array(
-                "test" => 'test'
+                "test" => $question["approved"]
             )
         ));
     }

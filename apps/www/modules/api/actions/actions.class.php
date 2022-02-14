@@ -200,7 +200,7 @@ class apiActions extends sfActions
         $myUserId = $this->getUser()->getAccount()->getId();
 
         $question_user = Doctrine_Query::create()
-            ->select("u.username, uq.id, uq.body, uq.updated_at, uq.created_at, uq.user_id, uq.closed_by,
+            ->select("u.username, uq.id, uq.body, uq.updated_at, uq.created_at, uq.user_id, uq.closed_by, uq.is_anonymous,
                     uqs.title, qs.id, qs.user_id as specialist_id, qsu.first_name, qsu.second_name, qsu.middle_name")
             ->from("User u")
             ->innerJoin("u.Question uq")
@@ -242,7 +242,7 @@ class apiActions extends sfActions
 
         $question_user = Doctrine_Query::create()
             ->select("s.user_id,
-                sq.body, sq.user_id, sq.closed_by, sq.updated_at, sq.created_at,
+                sq.body, sq.user_id, sq.closed_by, sq.updated_at, sq.created_at, sq.is_anonymous,
                 squ.first_name, squ.second_name, squ.middle_name")
             ->from("Specialist s")
             ->innerJoin("s.Questions sq")
@@ -589,7 +589,7 @@ class apiActions extends sfActions
         }
 
         $patient_card = Doctrine_Query::create()
-            ->select("q.*, s.*, sp.*, s.id AS specialist_id, s.user_id AS specialist_user_id, CONCAT_WS(' ', u.first_name, u.middle_name, u.second_name) AS specialist_name, u.photo AS specialist_photo, s.about AS specialist_about, last_answer")
+            ->select("q.*, s.*, sp.*, s.id AS specialist_id, s.user_id AS specialist_user_id, u.first_name, u.middle_name, u.second_name, u.photo AS specialist_photo, s.about AS specialist_about, last_answer")
             ->from("Question q")
             ->innerJoin("q.Specialists s")
             ->innerJoin("s.Specialty sp")

@@ -8,20 +8,45 @@ class apiActions extends sfActions
         $myUser = $this->getUser()->getAccount();
         if ($this->getUser()->isAuthenticated())
         {
-            $response = array(
-                "response"     => true,
-                "auth"         => true,
-                "isSpecialist" => $this->isSpecialist($myUser->getId()),
-                "first_name"   => $myUser->getFirst_name(),
-                "second_name"  => $myUser->getSecond_name(),
-                "middle_name"  => $myUser->getMiddle_name(),
-                "username"     => $myUser->getUsername(),
-                "gender"       => $myUser->getGender(),
-                "birth_date"   => $myUser->getBirth_date(),
-                "email"        => $myUser->getEmail(),
-                "phone"        => $myUser->getPhone(),
-                "photo"        => $myUser->getPhoto(),
-            );
+            if($this->isSpecialist($myUser->getId())){
+                $specialist = $this->getSpecialist($myUser->getId());
+
+                $response = array(
+                    "response" => true,
+                    "userData" => array(
+                        "auth" => true,
+                        "isSpecialist" => $this->isSpecialist($myUser->getId()),
+                        "first_name" => $myUser->getFirst_name(),
+                        "second_name" => $myUser->getSecond_name(),
+                        "middle_name" => $myUser->getMiddle_name(),
+                        "username" => $myUser->getUsername(),
+                        "gender" => $myUser->getGender(),
+                        "birth_date" => $myUser->getBirth_date(),
+                        "email" => $myUser->getEmail(),
+                        "phone" => $myUser->getPhone(),
+                        "photo" => $myUser->getPhoto(),
+                        "rating" => $specialist["rating"],
+                        "answers_count" => $specialist["answers_count"],
+                    ),
+                );
+            } else {
+                $response = array(
+                    "response" => true,
+                    "userData" => array(
+                        "auth" => true,
+                        "isSpecialist" => $this->isSpecialist($myUser->getId()),
+                        "first_name" => $myUser->getFirst_name(),
+                        "second_name" => $myUser->getSecond_name(),
+                        "middle_name" => $myUser->getMiddle_name(),
+                        "username" => $myUser->getUsername(),
+                        "gender" => $myUser->getGender(),
+                        "birth_date" => $myUser->getBirth_date(),
+                        "email" => $myUser->getEmail(),
+                        "phone" => $myUser->getPhone(),
+                        "photo" => $myUser->getPhoto(),
+                    ),
+                );
+            }
         } else {
             $response = array(
                 "response" => false,
@@ -354,16 +379,20 @@ class apiActions extends sfActions
             ->setAttachment($attachment)
             ->save();
 
+        $specialist = Doctrine::getTable('Specialist')->findOneBy("user_id", $user_id);
         $question = Doctrine::getTable('Question')->findOneBy("id", $question_id);
         $isSpecialist = $this->isSpecialist($user_id);
 
         if(!$question["approved"] && $isSpecialist){
-            $question["approved"] = true;
-            try {
-                $question->save();
-            } catch (Exception $e) {
-                var_dump($e->getMessage());
+            if($specialist["answers_count"]){
+                $specialist["answers_count"] += 1;
+            } else {
+                $specialist["answers_count"] = 1;
             }
+            $question["approved"] = true;
+
+            $specialist->save();
+            $question->save();
         }
 
 
@@ -673,6 +702,99 @@ class apiActions extends sfActions
         ));
     }
 
+    public function executeAdd_review(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type', 'application/json');
+        if (!$request->isMethod('post')) {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
+        if (!$this->getUser()->isAuthenticated()) {
+            return $this->renderText(json_encode(array(
+                "error" => "Для использования метода нужно авторизоваться"
+            )));
+        }
+
+        $data = $this->getPostData();
+        if ($data) {
+            $question_id = json_decode($data['question_id'], true);
+            $body        = json_decode($data['body'], true);
+            $informative = json_decode($data['informative'], true);
+            $courtesy    = json_decode($data['courtesy'], true);
+        } else {
+            $question_id = $request->getPostParameter('question_id');
+            $body        = $request->getPostParameter('body');
+            $informative = $request->getPostParameter('informative');
+            $courtesy    = $request->getPostParameter('courtesy');
+        }
+        if (!$question_id || !$informative || !$courtesy) {
+            return $this->renderText(json_encode(array(
+                "error" => "Введите все параметры: 'question_id','body','informative','courtesy'"
+            )));
+        }
+        if(!$body){
+            $body = "";
+        }
+        //      Создание отзыва
+        $myUser = $this->getUser()->getAccount();
+        $question_user_id = Doctrine_Query::create()
+            ->select("q.*, qu.*, qs.*")
+            ->from("Question q")
+            ->innerJoin("q.User qu")
+            ->innerJoin("q.Specialists qs")
+            ->where("q.id = " . $question_id . " AND q.user_id = " . $this->getUser()->getAccount()->getId())
+            ->fetchArray();
+        $specialist_id = $question_user_id[0]['Specialists'][0]['id'];
+
+        // Проверка был ли отзыв по вопросу
+        $review_by_question_id = Doctrine_Query::create()
+            ->select("r.*")
+            ->from("Review r")
+            ->where("r.question_id = " . $question_id)
+            ->fetchArray();
+        if($review_by_question_id){
+            $review = Doctrine::getTable('Review')->findOneBy("question_id", $question_id);
+            $review["body"] = $body;
+            $review["informative"] = $informative;
+            $review["courtesy"] = $courtesy;
+            $review->save();
+        } else {
+            $review = new Review();
+            $review->setQuestionId($question_id)
+                ->setUserId($myUser->getId())
+                ->setSpecialistId($question_user_id[0]['Specialists'][0]['id'])
+                ->setBody($body)
+                ->setInformative($informative)
+                ->setCourtesy($courtesy)
+                ->save();
+        }
+
+        //      Изменение рейтинга специалиста
+        $reviews_spec = Doctrine_Query::create()
+            ->select("r.*")
+            ->from("Review r")
+            ->where("r.specialist_id = " . $specialist_id)
+            ->fetchArray();
+
+        $RSvalue = 0.0;
+        for($i = 0;$i < count($reviews_spec);$i++){
+            $RSvalue += (float) $reviews_spec[$i]["informative"];
+            $RSvalue += (float) $reviews_spec[$i]["courtesy"];
+        }
+        $RSvalue = (float)  ($RSvalue / count($reviews_spec));
+
+        $specialist = Doctrine::getTable('Specialist')->findOneBy("id", $specialist_id);
+        $specialist["rating"] = $RSvalue;
+        $specialist->save();
+
+        return $this->renderText(json_encode(
+            $response = array(
+                "response" => "$RSvalue Отзыв успешно добавлен, рейтинг доктора изменен",
+            )
+        ));
+    }
+
     public function executeClose_question(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
@@ -699,6 +821,11 @@ class apiActions extends sfActions
             $question_id = json_decode($data['question_id'], true);
         } else {
             $question_id = $request->getPostParameter('question_id');
+        }
+        if(!$question_id){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите все параметры: 'question_id'"
+            )));
         }
 
         $question = Doctrine::getTable('Question')->findOneById($question_id);
@@ -804,6 +931,13 @@ class apiActions extends sfActions
             ->setSpecialtyId($q_specialty_id)
             ->save();
 
+        $specialist = Doctrine::getTable('Specialist')->findOneBy("id", $q_specialist_id);
+        if($specialist["question_count"]){
+            $specialist["question_count"] += 1;
+        } else {
+            $specialist["question_count"] = 1;
+        }
+        $specialist->save();
 
         return $this->renderText(json_encode(
             $response = array(
@@ -846,11 +980,24 @@ class apiActions extends sfActions
 
     public function isSpecialist($user_id){
         $isSpecialist = Doctrine_Query::create()
-            ->select("s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name")
+            ->select("s.specialty_id, s.rating, s.answers_count, s.about")
             ->from("Specialist s")
             ->where("s.user_id = {$user_id}")
             ->fetchArray();
         return ($isSpecialist != []);
+    }
+
+    public function getSpecialist($user_id){
+        //$specialist = Doctrine::getTable('Specialist')->findOneBy("id", "118");
+        $isSpecialist = Doctrine_Query::create()
+            ->select("s.specialty_id, s.rating, s.answers_count, s.about")
+            ->from("Specialist s")
+            ->where("s.user_id = {$user_id}")
+            ->fetchArray();
+        if($isSpecialist != [])
+            return $isSpecialist[0];
+        else
+            return null;
     }
 
     public function getPostData(){
@@ -861,9 +1008,13 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
-        $question = Doctrine::getTable('Question')->findOneBy("id", "9");
-        $question["approved"] = false;
-        $question->save();
+        $specialist = Doctrine::getTable('Specialist')->findOneBy("id", "118");
+        if($specialist["question_count"]){
+            $specialist["question_count"] += 1;
+        } else {
+            $specialist["question_count"] = 1;
+        }
+        $specialist->save();
 //        if(!$question["approved"]){
 //            $question["approved"] = true;
 //            try {
@@ -876,7 +1027,7 @@ class apiActions extends sfActions
 
         return $this->renderText(json_encode(
             $response = array(
-                "test" => $question["approved"]
+                "Specialist" => $specialist["question_count"]
             )
         ));
     }

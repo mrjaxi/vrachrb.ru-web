@@ -5,10 +5,22 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
+        $myUser = $this->getUser()->getAccount();
         if ($this->getUser()->isAuthenticated())
         {
             $response = array(
-                "response" => true,
+                "response"     => true,
+                "auth"         => true,
+                "isSpecialist" => $this->isSpecialist($myUser->getId()),
+                "first_name"   => $myUser->getFirst_name(),
+                "second_name"  => $myUser->getSecond_name(),
+                "middle_name"  => $myUser->getMiddle_name(),
+                "username"     => $myUser->getUsername(),
+                "gender"       => $myUser->getGender(),
+                "birth_date"   => $myUser->getBirth_date(),
+                "email"        => $myUser->getEmail(),
+                "phone"        => $myUser->getPhone(),
+                "photo"        => $myUser->getPhoto(),
             );
         } else {
             $response = array(

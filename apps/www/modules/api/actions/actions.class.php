@@ -79,6 +79,82 @@ class apiActions extends sfActions
         ));
     }
 
+    public function executeCheck_token(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type', 'application/json');
+
+        if (!$request->isMethod('post')) {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
+
+        $data = $this->getPostData();
+        if($data) {
+            $token = $data["token"];
+        } else {
+            $token = $request->getPostParameter("token");
+        }
+        $str = 'https://ulogin.ru/token.php?token=' . $token . '&host=vrachrb.ru';
+        var_dump("STR::".$str);
+        $s = file_get_contents($str);
+
+        $json = json_decode($s, true);
+
+        $identity = $json['identity'];
+
+        file_put_contents(sfConfig::get('sf_log_dir') . '/signinVks.txt', $s . "\n\n", FILE_APPEND);
+        file_put_contents(sfConfig::get('sf_log_dir') . '/signinVk.txt', $identity . "__\n", FILE_APPEND);
+
+        $identity_ = explode('://', $identity);
+
+        $identitys = array(
+            'http://' . $identity_[1],
+            'https://' . $identity_[1],
+        );
+
+        $user = Doctrine_Query::create()
+            ->select("u.*")
+            ->from("User u")
+            ->whereIn("u.username", $identitys)
+            ->orderBy("(SELECT COUNT(s.id) FROM Specialist s WHERE s.user_id = u.id) DESC")
+            ->fetchOne();
+
+        if (!$user) {
+//            $user = new User();
+//            $user->setUsername($identity);
+//            $user->setFirstName($json['first_name']);
+//            $user->setSecondName($json['last_name']);
+//            if ($json['sex'] != 0 && $json['sex'] != '') {
+//                $user->setGender($json['sex'] == 1 ? 'ж' : 'м');
+//            }
+//            $json['email'] ? $user->setEmail($json['email']) : '';
+//            $user->setBirthDate(isset($json['bdate']) ? $json['bdate'] : rand(1960, date('Y')) . ':' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . ':' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT) . ' 00:00:00');
+//
+//            $user->save();
+            $response = array(
+                "identity" => $identity,
+                "json" => $json,
+            );
+        }
+        else {
+            $response = array(
+                "response" => "Уже был такой пользователь"
+            );
+        }
+//        $this->getUser()->signIn($user, 1);
+
+//        if (Agreement::agreementCheck($user->getId())) {
+//            $this->login = true;
+//        } else {
+//            return $this->redirect('@login_index?authorization=1');
+//        }
+
+        return $this->renderText(json_encode(
+            $response
+        ));
+    }
+
     public function executeSignIn(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
@@ -858,6 +934,7 @@ class apiActions extends sfActions
             $q_body          = $data['q_body'];
             $q_specialist_id = $data['q_specialist_id'];
             $q_specialty_id  = $data['q_specialty_id'];
+            $anonymous       = $data['anonymous'];
             $user_about      = json_decode($data['user_about'], true);
         } else {
             // Пример json в qsh_anamnes: [{"sh_field":"137","val":"test"},{"sh_field":"138","val":"test"},{"sh_field":"139","val":"test","file":""},{"sh_field":"140","bool":"Нет","val":""},{"sh_field":"141","bool":"Нет","val":"ТЕКСТ и да нет"},{"sh_field":"142","choices":["список"]},{"sh_field":"143","choices":{"1":"без","2":"выбора"}}]
@@ -865,19 +942,26 @@ class apiActions extends sfActions
             $q_body          = $request->getPostParameter('q_body');
             $q_specialist_id = $request->getPostParameter('q_specialist_id');
             $q_specialty_id  = $request->getPostParameter('q_specialty_id');
+            $anonymous       = $request->getPostParameter('anonymous');
             $user_about      = json_decode($request->getPostParameter('user_about'), true);
         }
 
-        if(!$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id){
+        if(!$q_body || !$qsh_anamnes || !$q_specialist_id || !$q_specialty_id ){
             return $this->renderText(json_encode(array(
-                "error" => "Введите все параметры: 'q_body','qsh_anamnes','q_specialist_id','q_specialty_id'"
+                "error" => "Введите все параметры: 'q_body', 'qsh_anamnes', 'q_specialist_id', 'q_specialty_id', 'anonymous'"
+            )));
+        }
+        if(!($anonymous == 1 || $anonymous == 0)){
+            return $this->renderText(json_encode(array(
+                "error" => "anonymous должен быть либо 1 либо 0"
             )));
         }
 
         $question = new Question();
         $question->setUserId($q_user_id)
             ->setBody($q_body)
-            ->setVkNotice(false);
+            ->setVkNotice(false)
+            ->setIsAnonymous($anonymous);
         if($user_about){
             $username = implode(' ', array($user_about["first_name"], $user_about["second_name"], $user_about["middle_name"]));
             $checkUser = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
@@ -994,18 +1078,22 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
-//        $review = new Review();
-//        $review->setQuestionId(10)
-//            ->setUserId(14116)
-//            ->setSpecialistId(121)
-//            ->setBody("kek")
-//            ->setInformative(1)
-//            ->setCourtesy(1)
-//            ->save();
+        $data = $this->getPostData();
+        if($data) {
+            $anonimus = $data['anonimus'];
+        } else {
+            $anonimus = $request->getPostParameter('anonimus');
+        }
+
+        if(!($anonimus == 1 || $anonimus == 0)){
+            return $this->renderText(json_encode(array(
+                "error" => "'anonimus' должен быть либо 0 либо 1, вместо $anonimus"
+            )));
+        }
 
         return $this->renderText(json_encode(
             $response = array(
-                "test" => ""
+                "anonimus" => $anonimus
             )
         ));
     }

@@ -79,7 +79,7 @@ class apiActions extends sfActions
         ));
     }
 
-    public function executeCheck_token(sfWebRequest $request)
+    public function executeSign_vk(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type', 'application/json');
 
@@ -90,27 +90,38 @@ class apiActions extends sfActions
         }
 
         $data = $this->getPostData();
-        if($data) {
-            $token = $data["token"];
+        if ($data) {
+            $user_id = $data["user_id"];
+            $access_token = $data["access_token"];
+            $email = $data["email"];
         } else {
-            $token = $request->getPostParameter("token");
+            $user_id = $request->getPostParameter("user_id");
+            $access_token = $request->getPostParameter("access_token");
+            $email = $request->getPostParameter("email");
         }
-        $str = 'https://ulogin.ru/token.php?token=' . $token . '&host=vrachrb.ru';
-        var_dump("STR::".$str);
-        $s = file_get_contents($str);
+        if(!$user_id || !$access_token || !$email){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите параметры 'user_id', 'access_token', 'email'"
+            )));
+        }
 
+        $str = 'https://api.vk.com/method/users.get?user_ids=' . $user_id .
+            '&fields=first_name,last_name,photo,sex,email,bdate' .
+            '&access_token=' . $access_token .
+            '&v=5.131';
+        $s = file_get_contents($str);
         $json = json_decode($s, true);
 
-        $identity = $json['identity'];
-
-        file_put_contents(sfConfig::get('sf_log_dir') . '/signinVks.txt', $s . "\n\n", FILE_APPEND);
-        file_put_contents(sfConfig::get('sf_log_dir') . '/signinVk.txt', $identity . "__\n", FILE_APPEND);
-
-        $identity_ = explode('://', $identity);
+        if ($json['error']) {
+            return $this->renderText(json_encode(array(
+                "error" => $json['error']['error_msg'],
+            )));
+        }
+        $json = $json['response'][0];
 
         $identitys = array(
-            'http://' . $identity_[1],
-            'https://' . $identity_[1],
+            'http://vk.com/id' . $json["id"],
+            'https://vk.com/id' . $json["id"],
         );
 
         $user = Doctrine_Query::create()
@@ -121,38 +132,38 @@ class apiActions extends sfActions
             ->fetchOne();
 
         if (!$user) {
-//            $user = new User();
-//            $user->setUsername($identity);
-//            $user->setFirstName($json['first_name']);
-//            $user->setSecondName($json['last_name']);
-//            if ($json['sex'] != 0 && $json['sex'] != '') {
-//                $user->setGender($json['sex'] == 1 ? 'ж' : 'м');
-//            }
-//            $json['email'] ? $user->setEmail($json['email']) : '';
-//            $user->setBirthDate(isset($json['bdate']) ? $json['bdate'] : rand(1960, date('Y')) . ':' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . ':' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT) . ' 00:00:00');
-//
-//            $user->save();
-            $response = array(
-                "identity" => $identity,
-                "json" => $json,
-            );
-        }
-        else {
-            $response = array(
-                "response" => "Уже был такой пользователь"
-            );
-        }
-//        $this->getUser()->signIn($user, 1);
+            $user = new User();
+            $user->setUsername($identitys[1]);
+            $user->setFirstName($json['first_name']);
+            $user->setSecondName($json['last_name']);
+            if ($json['sex'] != 0 && $json['sex'] != '') {
+                $user->setGender($json['sex'] == 1 ? 'ж' : 'м');
+            }
+            $user->setBirthDate(isset($json['bdate']) ? implode(".", array_reverse(explode(".", $json['bdate']))) : rand(1960, date('Y')) . ':' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . ':' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT) . ' 00:00:00');
+            $email ? $user->setEmail($email) : '';
 
-//        if (Agreement::agreementCheck($user->getId())) {
-//            $this->login = true;
-//        } else {
-//            return $this->redirect('@login_index?authorization=1');
-//        }
+            $user->save();
+        }
+        $this->getUser()->signIn($user, 1);
 
-        return $this->renderText(json_encode(
-            $response
-        ));
+        if (Agreement::agreementCheck($user->getId())) {
+            // Принятие соглашений
+            $agreements = Doctrine_Query::create()
+                ->select('a.id')
+                ->from('Agreement a')
+                ->fetchArray();
+
+            for($i = 0;$i < count($agreements);$i++){
+                $a_complete = new AgreementComplete();
+                $a_complete->setUserId($user->get('id'))
+                    ->setAgreementId($agreements[$i]['id'])
+                    ->save();
+            }
+        }
+
+        return $this->renderText(json_encode(array(
+            "auth" => true
+        )));
     }
 
     public function executeSignIn(sfWebRequest $request)

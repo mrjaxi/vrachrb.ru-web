@@ -94,10 +94,12 @@ class apiActions extends sfActions
             $user_id = $data["user_id"];
             $access_token = $data["access_token"];
             $email = $data["email"];
+            $agreement = (boolean) $data["agreement"];
         } else {
             $user_id = $request->getPostParameter("user_id");
             $access_token = $request->getPostParameter("access_token");
             $email = $request->getPostParameter("email");
+            $agreement = (boolean) $request->getPostParameter("agreement");
         }
         if(!$user_id || !$access_token || !$email){
             return $this->renderText(json_encode(array(
@@ -140,11 +142,15 @@ class apiActions extends sfActions
                 $user->setGender($json['sex'] == 1 ? 'ж' : 'м');
             }
             $user->setBirthDate(isset($json['bdate']) ? implode(".", array_reverse(explode(".", $json['bdate']))) : rand(1960, date('Y')) . ':' . str_pad(rand(1, 12), 2, '0', STR_PAD_LEFT) . ':' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT) . ' 00:00:00');
-            $email ? $user->setEmail($email) : '';
+            $email != "null" ? $user->setEmail($email) : '';
 
             $user->save();
         }
-        $this->getUser()->signIn($user, 1);
+        if (Agreement::agreementCheck($user->getId()) && !$agreement) {
+            return $this->renderText(json_encode(array(
+                "agreement" => "Нужно принять соглашения"
+            )));
+        }
 
         if (Agreement::agreementCheck($user->getId())) {
             // Принятие соглашений
@@ -161,9 +167,47 @@ class apiActions extends sfActions
             }
         }
 
-        return $this->renderText(json_encode(array(
-            "auth" => true
-        )));
+        $this->getUser()->signIn($user, 1);
+
+        if($this->isSpecialist($user->getId())){
+            $specialist = $this->getSpecialist($user->getId());
+
+            return $this->renderText(json_encode(array(
+                "auth" => true,
+                "userData" => array(
+                    "auth" => true,
+                    "isSpecialist" => $this->isSpecialist($user->getId()),
+                    "first_name"   => $user->getFirst_name(),
+                    "second_name"  => $user->getSecond_name(),
+                    "middle_name"  => $user->getMiddle_name(),
+                    "username"     => $user->getUsername(),
+                    "gender"       => $user->getGender(),
+                    "birth_date"   => $user->getBirth_date(),
+                    "email"        => $user->getEmail(),
+                    "phone"        => $user->getPhone(),
+                    "photo"        => $user->getPhoto(),
+                    "rating"       => $specialist["rating"],
+                    "answers_count" => $specialist["answers_count"],
+                ),
+            )));
+        } else {
+            return $this->renderText(json_encode(array(
+                "auth" => true,
+                "userData" => array(
+                    "auth" => true,
+                    "isSpecialist" => $this->isSpecialist($user->getId()),
+                    "first_name"   => $user->getFirst_name(),
+                    "second_name"  => $user->getSecond_name(),
+                    "middle_name"  => $user->getMiddle_name(),
+                    "username"     => $user->getUsername(),
+                    "gender"       => $user->getGender(),
+                    "birth_date"   => $user->getBirth_date(),
+                    "email"        => $user->getEmail(),
+                    "phone"        => $user->getPhone(),
+                    "photo"        => $user->getPhoto(),
+                ),
+            )));
+        }
     }
 
     public function executeSignIn(sfWebRequest $request)
@@ -188,6 +232,7 @@ class apiActions extends sfActions
         $usernameDoctrine = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
 
         if ($usernameDoctrine){
+            var_dump("нашел пользователя");
             $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
             $encrypted = call_user_func_array($algorithm, array($usernameDoctrine->get("salt") . $password));
 

@@ -232,7 +232,7 @@ class apiActions extends sfActions
         $usernameDoctrine = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
 
         if ($usernameDoctrine){
-            var_dump("нашел пользователя");
+//            var_dump("нашел пользователя");
             $algorithm = sfConfig::get('app_doAuth_algorithm_callable', 'sha1');
             $encrypted = call_user_func_array($algorithm, array($usernameDoctrine->get("salt") . $password));
 

@@ -136,8 +136,9 @@ class apiActions extends sfActions
         if (!$user) {
             $user = new User();
             $user->setUsername($identitys[1]);
-            $user->setFirstName($json['first_name']);
-            $user->setSecondName($json['last_name']);
+            $user->setFirstName($json['first_name'] ? $json['first_name'] : "");
+            $user->setSecondName($json['last_name'] ? $json['last_name'] : "");
+            $user->setMiddleName("");
             if ($json['sex'] != 0 && $json['sex'] != '') {
                 $user->setGender($json['sex'] == 1 ? 'ж' : 'м');
             }

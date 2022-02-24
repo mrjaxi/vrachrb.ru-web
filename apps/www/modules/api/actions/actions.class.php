@@ -520,6 +520,13 @@ class apiActions extends sfActions
                 $attachment = "";
         }
 
+        $question = Doctrine::getTable('Question')->findOneBy("id", $question_id);
+        if($question["closed_by"]){
+            return $this->renderText(json_encode(array(
+                "error" => "Вопрос уже закрыт"
+            )));
+        }
+
         if(!$user_id || !$question_id || !$body){
             return $this->renderText(json_encode(array(
                 "error" => "Введите параметры 'question_id', 'body', при желании 'attachment'"
@@ -534,7 +541,6 @@ class apiActions extends sfActions
             ->setAttachment($attachment)
             ->save();
 
-        $question = Doctrine::getTable('Question')->findOneBy("id", $question_id);
         $isSpecialist = $this->isSpecialist($user_id);
 
         if(!$question["approved"] && $isSpecialist){
@@ -662,7 +668,7 @@ class apiActions extends sfActions
 
         return $this->renderText(json_encode(
             $response = array(
-                "test" => $agreements
+                "response" => $agreements
             )
         ));
     }

@@ -13,7 +13,7 @@ Deploy to dev:
   only:
     - master
   script:
-    - rsync --exclude '.git' --exclude 'config/databases.yml' --exclude '.gitlab-ci.yml' -avzh . /www/vrachrb.atmadev.ru
+    - rsync --exclude '.git' --exclude 'config/databases.yml' --exclude 'symfony' --exclude '.gitlab-ci.yml' -avzh . /www/vrachrb.atmadev.ru
     - cd /www/vrachrb.atmadev.ru
     - ./symfony cc
 

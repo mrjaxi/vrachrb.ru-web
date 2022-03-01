@@ -117,7 +117,7 @@ class ProjectUtils
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $r = curl_exec($ch);
         curl_close($ch);
-        file_put_contents('/www/vrach.log', print_r($r, true), FILE_APPEND);
+//        file_put_contents('/www/vrach.log', print_r($r, true), FILE_APPEND);
         return $r;
     }
 

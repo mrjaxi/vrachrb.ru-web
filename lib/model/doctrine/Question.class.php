@@ -406,14 +406,14 @@ class Question extends BaseQuestion
         ;
         if(count($notice_check) == 0)
         {
-//          Page::noticeAdd('s', 'dialog', $this->getId(), 'question');
+          Page::noticeAdd('s', 'dialog', $this->getId(), 'question');
 
-          $notice = new Notice();
-          $notice->setUserId($sp->getUserId());
-          $notice->setType('dialog');
-          $notice->setInnerId($this->getId());
-          $notice->setEvent('question');
-          $notice->save();
+//          $notice = new Notice();
+//          $notice->setUserId($sp->getUserId());
+//          $notice->setType('dialog');
+//          $notice->setInnerId($this->getId());
+//          $notice->setEvent('question');
+//          $notice->save();
         }
       }
     }

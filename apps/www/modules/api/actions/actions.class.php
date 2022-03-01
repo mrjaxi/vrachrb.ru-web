@@ -479,6 +479,20 @@ class apiActions extends sfActions
             ->fetchArray();
         $question_user[0]['my_id'] = $myUserId;
 
+        // Очищение уведомлений чата
+        $notice = Doctrine_Query::create()
+            ->select("n.*")
+            ->from("Notice n")
+            ->where("n.user_id = " . $myUserId . " AND n.type = 'dialog' AND n.inner_id = " . $questionId)
+            ->execute();
+        if(count($notice) > 0)
+        {
+            foreach ($notice as $n)
+            {
+                $n->delete();
+            }
+        }
+
         return $this->renderText(json_encode(array(
             "response" => $question_user
         )));
@@ -527,7 +541,7 @@ class apiActions extends sfActions
             )));
         }
 
-        if(!$user_id || !$question_id || !$body){
+        if(!$question_id || !$body){
             return $this->renderText(json_encode(array(
                 "error" => "Введите параметры 'question_id', 'body', при желании 'attachment'"
             )));
@@ -547,7 +561,6 @@ class apiActions extends sfActions
             $question["approved"] = true;
             $question->save();
         }
-
 
         return $this->renderText(json_encode(array(
             "response" => "Ответ успешно добавлен"
@@ -660,9 +673,10 @@ class apiActions extends sfActions
             ->from('Agreement a')
             ->fetchArray();
 
+        $host = $request->getHost();
         for($i = 0;$i < count($agreements);$i++){
             if($agreements[$i]['in_documentation'] == true){
-                $agreements[$i]['url'] = "http://vrachrb.ru/agreement/{$agreements[$i]["id"]}/";
+                $agreements[$i]['url'] = "http://{$host}/agreement/{$agreements[$i]["id"]}/";
             }
         }
 
@@ -871,12 +885,12 @@ class apiActions extends sfActions
 
         $data = $this->getPostData();
         if ($data) {
-            $question_id = json_decode($data['question_id'], true);
+            $question_id = (integer) json_decode($data['question_id'], true);
             $body        = json_decode($data["body"], false);
             $informative = json_decode($data['informative'], true);
             $courtesy    = json_decode($data['courtesy'], true);
         } else {
-            $question_id = $request->getPostParameter('question_id');
+            $question_id = (integer) $request->getPostParameter('question_id');
             $body        = $request->getPostParameter('body');
             $informative = $request->getPostParameter('informative');
             $courtesy    = $request->getPostParameter('courtesy');
@@ -921,6 +935,7 @@ class apiActions extends sfActions
                 ->setCourtesy($courtesy)
                 ->save();
         }
+        Page::noticeAdd('s', 'review', $review->getId(), 'review');
 
         return $this->renderText(json_encode(
             $response = array(
@@ -967,6 +982,7 @@ class apiActions extends sfActions
             ->setClosingDate(date('Y-m-d' . ' ' . 'H:i:s'))
             ->save();
 
+        Page::noticeAdd('u', 'dialog', $question_id, 'closed');
 
         return $this->renderText(json_encode(
             $response = array(
@@ -1072,6 +1088,7 @@ class apiActions extends sfActions
             ->setSpecialtyId($q_specialty_id)
             ->save();
 
+
         return $this->renderText(json_encode(
             $response = array(
                 "response" => 'Вопрос успешно задан'
@@ -1137,26 +1154,73 @@ class apiActions extends sfActions
         return json_decode(file_get_contents('php://input'), true);
     }
 
+    public function getUserIdByQuestionId($question_id){
+        $user_id_by_q_id = Doctrine_Query::create()
+            ->select("qs.*, qss.*, qssu.*")
+            ->from("QuestionSpecialist qs")
+            ->innerJoin("qs.Specialist qss")
+            ->innerJoin("qss.User qssu")
+            ->where("qs.question_id = {$question_id}")
+            ->fetchArray()[0]["Specialist"]["User"]["id"];
+
+        return $user_id_by_q_id;
+    }
+
+    public function pushNotifications($tokens = array(""), $title = "", $message = "", $data = array()){
+        $method = 'http://192.168.2.7:8103/gorush/api/push';
+        $params = array(
+            "notifications" => array(
+                array(
+                    "tokens" => $tokens,
+                    "data" => $data,
+                    "platform" => 1,
+                    "title" => "IOS::" . $title,
+                    "message" => $message,
+                    "topic" => "company.atma.vrachrb",
+                    "priority" => "high",
+                    "content_available" => true,
+                    "push_type" => "background",
+                ),
+                array(
+                    "tokens" => $tokens,
+                    "data" => $data,
+                    "platform" => 2,
+                    "title" => "ANDROID::" . $title,
+                    "message" => $message,
+                    "topic" => "company.atma.vrachrb",
+                    "priority" => "high",
+                    "content_available" => true,
+                    "push_type" => "background",
+                ),
+                array(
+                    "tokens" => $tokens,
+                    "huawei_data" => json_encode($data),
+                    "platform" => 3,
+                    "title" => "HUAWEI::" . $title,
+                    "message" => $message,
+                    "topic" => "company.atma.vrachrb",
+                    "priority" => "high",
+                    "content_available" => true,
+                    "push_type" => "background",
+                )
+            )
+        );
+//        return $params;
+        return json_decode(ProjectUtils::post($method, json_encode($params)), true);
+    }
+
     public function executeTest(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
-        $data = $this->getPostData();
-        if($data) {
-            $anonimus = $data['anonimus'];
-        } else {
-            $anonimus = $request->getPostParameter('anonimus');
-        }
-
-        if(!($anonimus == 1 || $anonimus == 0)){
-            return $this->renderText(json_encode(array(
-                "error" => "'anonimus' должен быть либо 0 либо 1, вместо $anonimus"
-            )));
-        }
+        $json = $this->pushNotifications(array("fB_0viatS_a5DSD83ywkuJ:APA91bF60tuio25--LJx-leKlcuccbhNkZePDsIC94G-Ej5btKmYP8kn3J3YCUh9GZr2v7g0Z6ikKNyH3em2fDj_DmKBNJkqAXZUUt5iLdQlJGSW7qg2E9dBcGw9hn5dD-WIODhq3_Al"),
+            "TITLE","MESSAGE",array(
+                "kek" => "kek1"
+            ));
 
         return $this->renderText(json_encode(
             $response = array(
-                "anonimus" => $anonimus
+                "json" => $json
             )
         ));
     }

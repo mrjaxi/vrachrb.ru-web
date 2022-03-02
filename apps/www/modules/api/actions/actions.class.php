@@ -403,6 +403,19 @@ class apiActions extends sfActions
                 "error" => "Нет чатов"
             )));
         }
+        // Проверка на наличие уведомлений в вопросах
+        for($i = 0; $i < count($question_user[0]["Question"]); $i++){
+            $notice = Doctrine_Query::create()
+                ->select("n.*")
+                ->from("Notice n")
+                ->where("n.user_id = " . $myUserId . " AND n.type = 'dialog' AND n.inner_id = " . $question_user[0]["Question"][$i]["id"])
+                ->execute();
+            if (count($notice) > 0) {
+                $question_user[0]["Question"][$i]["notice"] = true;
+            } else {
+                $question_user[0]["Question"][$i]["notice"] = false;
+            }
+        }
 
         return $this->renderText(json_encode(array(
             "response" => $question_user
@@ -442,6 +455,19 @@ class apiActions extends sfActions
             return $this->renderText(json_encode(array(
                 "error" => "Нет чатов"
             )));
+        }
+        // Проверка на наличие уведомлений в вопросах
+        for($i = 0; $i < count($question_user[0]["Questions"]); $i++){
+            $notice = Doctrine_Query::create()
+                ->select("n.*")
+                ->from("Notice n")
+                ->where("n.user_id = " . $myUserId . " AND n.type = 'dialog' AND n.inner_id = " . $question_user[0]["Questions"][$i]["id"])
+                ->execute();
+            if (count($notice) > 0) {
+                $question_user[0]["Questions"][$i]["notice"] = true;
+            } else {
+                $question_user[0]["Questions"][$i]["notice"] = false;
+            }
         }
 
         return $this->renderText(json_encode(array(

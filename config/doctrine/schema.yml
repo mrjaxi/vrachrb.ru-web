@@ -1051,6 +1051,24 @@ Notice:
         local: user_id
         foreign: id
 
+DeviceTokens:
+  columns:
+    user_id:
+      type: integer
+      notnull: true
+    token:
+      type: string(255)
+      notnull: true
+    type:
+      type: integer
+      notnull: false
+  relations:
+    User:
+      onDelete: CASCADE
+      local: user_id
+      foreign: id
+
+
 Attached_family_users:
   columns:
     user_id:

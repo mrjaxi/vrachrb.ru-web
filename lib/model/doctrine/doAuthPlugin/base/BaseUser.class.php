@@ -34,9 +34,9 @@
  * @property Doctrine_Collection $Analysis
  * @property Doctrine_Collection $Feedback
  * @property Doctrine_Collection $Notice
+ * @property Doctrine_Collection $DeviceTokens
  * @property Doctrine_Collection $Attached_family_users
  * @property Doctrine_Collection $Message_error
- * @property Doctrine_Collection $Token
  * 
  * @method string              getUsername()              Returns the current record's "username" value
  * @method string              getFirstName()             Returns the current record's "first_name" value
@@ -67,9 +67,9 @@
  * @method Doctrine_Collection getAnalysis()              Returns the current record's "Analysis" collection
  * @method Doctrine_Collection getFeedback()              Returns the current record's "Feedback" collection
  * @method Doctrine_Collection getNotice()                Returns the current record's "Notice" collection
+ * @method Doctrine_Collection getDeviceTokens()          Returns the current record's "DeviceTokens" collection
  * @method Doctrine_Collection getAttachedFamilyUsers()   Returns the current record's "Attached_family_users" collection
  * @method Doctrine_Collection getMessageError()          Returns the current record's "Message_error" collection
- * @method Doctrine_Collection getToken()                 Returns the current record's "Token" collection
  * @method User                setUsername()              Sets the current record's "username" value
  * @method User                setFirstName()             Sets the current record's "first_name" value
  * @method User                setSecondName()            Sets the current record's "second_name" value
@@ -99,9 +99,9 @@
  * @method User                setAnalysis()              Sets the current record's "Analysis" collection
  * @method User                setFeedback()              Sets the current record's "Feedback" collection
  * @method User                setNotice()                Sets the current record's "Notice" collection
+ * @method User                setDeviceTokens()          Sets the current record's "DeviceTokens" collection
  * @method User                setAttachedFamilyUsers()   Sets the current record's "Attached_family_users" collection
  * @method User                setMessageError()          Sets the current record's "Message_error" collection
- * @method User                setToken()                 Sets the current record's "Token" collection
  * 
  * @package    sf
  * @subpackage model
@@ -250,15 +250,15 @@ abstract class BaseUser extends sfDoctrineRecord
              'local' => 'id',
              'foreign' => 'user_id'));
 
+        $this->hasMany('DeviceTokens', array(
+             'local' => 'id',
+             'foreign' => 'user_id'));
+
         $this->hasMany('Attached_family_users', array(
              'local' => 'id',
              'foreign' => 'user_id'));
 
         $this->hasMany('Message_error', array(
-             'local' => 'id',
-             'foreign' => 'user_id'));
-
-        $this->hasMany('Token', array(
              'local' => 'id',
              'foreign' => 'user_id'));
 

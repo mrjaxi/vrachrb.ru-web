@@ -58,6 +58,66 @@ class apiActions extends sfActions
         ));
     }
 
+    public function executeSaveDeviceToken($request){
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$request->isMethod('post')) {
+            return $this->renderText(json_encode(array(
+                "error" => "Поддерживается только POST запрос.",
+            )));
+        }
+
+        if (!$this->getUser()->isAuthenticated()){
+            return $this->renderText(json_encode(array(
+                "error" => "Не аутентифицирован",
+            )));
+        }
+        $myUser = $this->getUser()->getAccount();
+
+        $data = $this->getPostData();
+        if ($data) {
+            $token = (string) $data["token"];
+            $type  = (int) $data["type"];
+        } else {
+            $token = (string) $request->getPostParameter("token");
+            $type  = (int) $request->getPostParameter("type");
+        }
+        if(!$token || !$type){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите параметры 'token', 'type'"
+            )));
+        }
+
+        $deviceToken = Doctrine_Query::create()
+            ->select("dt.*")
+            ->from("DeviceTokens dt")
+            ->where("dt.user_id = " . $myUser->getId() . " AND dt.type = " . $type)
+            ->fetchArray()[0];
+        if($deviceToken){
+            // Перезапись токена
+            $device_token = Doctrine::getTable('DeviceTokens')->findBy("user_id", $myUser->getId());
+            if(count($device_token) == 1)
+                $device_token[0]["token"] = $token;
+            else
+                for($i = 0; $i < count($device_token); $i++)
+                    if($device_token[$i]["type"] == $type)
+                        $device_token[$i]["token"] = $token;
+
+            $device_token->save();
+        } else {
+            // Создание нового токена девайса
+            $device_token = new DeviceTokens();
+            $device_token->setUserId($myUser->getId())
+                ->setType($type)
+                ->setToken($token)
+                ->save();
+        }
+
+        return $this->renderText(json_encode(array(
+            "response" => "Устройство успешно добавлено"
+        )));
+    }
+
     public function executeSignOut($request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
@@ -559,17 +619,16 @@ class apiActions extends sfActions
             else
                 $attachment = "";
         }
+        if(!$question_id || !$body){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите параметры 'question_id', 'body', при желании 'attachment'"
+            )));
+        }
 
         $question = Doctrine::getTable('Question')->findOneBy("id", $question_id);
         if($question["closed_by"]){
             return $this->renderText(json_encode(array(
                 "error" => "Вопрос уже закрыт"
-            )));
-        }
-
-        if(!$question_id || !$body){
-            return $this->renderText(json_encode(array(
-                "error" => "Введите параметры 'question_id', 'body', при желании 'attachment'"
             )));
         }
 
@@ -586,6 +645,49 @@ class apiActions extends sfActions
         if(!$question["approved"] && $isSpecialist){
             $question["approved"] = true;
             $question->save();
+        }
+
+        if($isSpecialist) {
+            $deviceToken = Doctrine_Query::create()
+                ->select("dt.*")
+                ->from("DeviceTokens dt")
+                ->where("dt.user_id = " . $user_id)
+                ->fetchArray();
+            if ($deviceToken) {
+                $tokens = array();
+                for ($i = 0; $i < count($deviceToken); $i++) {
+                    array_push($tokens, $deviceToken[$i]["token"]);
+                }
+                $json = $this->pushNotifications($tokens,
+                    "TITLE",
+                    $body,
+                    array(
+                        "kek" => "kek1"
+                    )
+                );
+
+            }
+        } else {
+            $specialist_user_id = $question->getSpecialists()[0]["user_id"];
+            $deviceToken = Doctrine_Query::create()
+                ->select("dt.*")
+                ->from("DeviceTokens dt")
+                ->where("dt.user_id = " . $specialist_user_id)
+                ->fetchArray();
+            if ($deviceToken) {
+                $tokens = array();
+                for ($i = 0; $i < count($deviceToken); $i++) {
+                    array_push($tokens, $deviceToken[$i]["token"]);
+                }
+                $json = $this->pushNotifications($tokens,
+                    "TITLE",
+                    $body,
+                    array(
+                        "kek" => "kek1"
+                    )
+                );
+
+            }
         }
 
         return $this->renderText(json_encode(array(
@@ -1241,14 +1343,32 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
-        $json = $this->pushNotifications(array("fB_0viatS_a5DSD83ywkuJ:APA91bF60tuio25--LJx-leKlcuccbhNkZePDsIC94G-Ej5btKmYP8kn3J3YCUh9GZr2v7g0Z6ikKNyH3em2fDj_DmKBNJkqAXZUUt5iLdQlJGSW7qg2E9dBcGw9hn5dD-WIODhq3_Al"),
+        $json = $this->pushNotifications(array("cO-5E-eBSwqr0RWVvXrMLg:APA91bFILUHgUstYw2mfmKGk-x9VwOnR3rc2XQr6P3gpDoqweP1tMnWWDjdOBC_QaexB4P7z66QNDSPk9siEg4Y_Kn4JI8gPovaf4QXdVWKESEr6LtViCt3NPFjgbxOk_vqp16mu2rSA"),
             "TITLE","MESSAGE",array(
                 "kek" => "kek1"
             ));
+//        $myUser = $this->getUser()->getAccount();
+//
+//        $deviceToken = Doctrine_Query::create()
+//            ->select("dt.*")
+//            ->from("DeviceTokens dt")
+//            ->where("dt.user_id = " . $myUser->getId())
+//            ->fetchArray();
+//
+//        if($deviceToken){
+//            $tokens = array();
+//            for($i = 0; $i < count($deviceToken); $i++){
+//                array_push($tokens, $deviceToken[$i]["token"]);
+//            }
+//        }
+//
+//        $question = Doctrine::getTable('Question')->findOneBy("id", 13);
 
         return $this->renderText(json_encode(
             $response = array(
                 "json" => $json
+//                "tokens" => $tokens,
+//                "specUser" => $question->getSpecialists()[0]["user_id"]
             )
         ));
     }

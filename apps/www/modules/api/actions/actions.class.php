@@ -1114,6 +1114,8 @@ class apiActions extends sfActions
             ->setSpecialtyId($q_specialty_id)
             ->save();
 
+        Page::noticeAdd('s', 'dialog', $question->getId(), 'question');
+
 
         return $this->renderText(json_encode(
             $response = array(

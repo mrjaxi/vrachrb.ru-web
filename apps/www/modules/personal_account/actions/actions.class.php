@@ -108,6 +108,35 @@ class personal_accountActions extends sfActions
               $this->question_id = $q_id;
             }
 
+              $question = Doctrine::getTable('Question')->findOneBy("id", $q_id);
+              $userMessage = Doctrine::getTable('User')->findOneBy("id", $request_answer['user_id']);
+
+              $specialist_user_id = $question->getSpecialists()[0]["user_id"];
+              $deviceToken = Doctrine_Query::create()
+                  ->select("dt.*")
+                  ->from("DeviceTokens dt")
+                  ->where("dt.user_id = " . $specialist_user_id)
+                  ->fetchArray();
+              if ($deviceToken) {
+                  $tokens = array();
+                  for ($i = 0; $i < count($deviceToken); $i++) {
+                      array_push($tokens, $deviceToken[$i]["token"]);
+                  }
+                  $json = ProjectUtils::pushNotifications($tokens,
+                      array(
+                          "type" => "message",
+                          "id" => 172,
+                          "user_id" => $request_answer['user_id'],
+                          "chat_id" => $question["id"],
+                          "created_at" => $question["created_at"],
+                          "message" => $request_answer["body"],
+                          "title" => "Новое сообщение",
+                          "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
+                          "isSpecialist" => false
+                      )
+                  );
+              }
+
 //          reception_info
 
             if($request->getParameter('reception_info') && is_numeric($request->getParameter('reception_info')))

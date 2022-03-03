@@ -130,6 +130,56 @@ class Page extends BasePage
     if($notice_form->isValid())
     {
       $notice_form->save();
+
+      $deviceToken = Doctrine_Query::create()
+          ->select("dt.*")
+          ->from("DeviceTokens dt")
+          ->where("dt.user_id = " . $user_id)
+          ->fetchArray();
+      if ($deviceToken) {
+          $tokens = array();
+          for ($i = 0; $i < count($deviceToken); $i++) {
+              array_push($tokens, $deviceToken[$i]["token"]);
+          }
+          switch ($event){
+              case "question":
+                  $json = ProjectUtils::pushNotifications($tokens,
+                      array(
+                          "type" => $event,
+                          "message" => "Вам задали новый вопрос! Ответьте на него в ближайшее время",
+                          "title" => "Новый вопрос"
+                      )
+                  );
+                  break;
+              case "review":
+                  $json = ProjectUtils::pushNotifications($tokens,
+                      array(
+                          "type" => $event,
+                          "message" => "Вам оставили новый отзыв, проверьте его в личном кабинете на сайте vrachrb.ru",
+                          "title" => "Новый отзыв"
+                      )
+                  );
+                  break;
+              case "closed":
+                  $json = ProjectUtils::pushNotifications($tokens,
+                      array(
+                          "type" => $event,
+                          "message" => "Врач закрыл вопрос, поставьте ему оценку за оказанную усулугу, пожалуйста. Спасибо, что пользуетесь нашим сервисом",
+                          "title" => "Вопрос закрыт"
+                      )
+                  );
+                  break;
+              case "resume":
+                  $json = ProjectUtils::pushNotifications($tokens,
+                      array(
+                          "type" => $event,
+                          "message" => "Врач возобновил беседу по вопросу, проверьте чат.",
+                          "title" => "Беседа возобновлена"
+                      )
+                  );
+                  break;
+          }
+      }
     }
   }
 

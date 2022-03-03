@@ -285,9 +285,11 @@ class apiActions extends sfActions
         if($data) {
             $username = $data["user"];
             $password = $data["password"];
+            $agreement = (boolean) $data["agreement"];
         } else {
             $username = $request->getPostParameter("user");
             $password = $request->getPostParameter("password");
+            $agreement = (boolean) $request->getPostParameter("agreement");
         }
 
         $usernameDoctrine = Doctrine::getTable('User')->findOneByUsernameOrEmail($username, $username);
@@ -298,6 +300,27 @@ class apiActions extends sfActions
             $encrypted = call_user_func_array($algorithm, array($usernameDoctrine->get("salt") . $password));
 
             if ($encrypted == $usernameDoctrine->get("password")) {
+                if (Agreement::agreementCheck($usernameDoctrine->getId()) && !$agreement) {
+                    return $this->renderText(json_encode(array(
+                        "agreement" => "Нужно принять соглашения"
+                    )));
+                }
+
+                if (Agreement::agreementCheck($usernameDoctrine->getId())) {
+                    // Принятие соглашений
+                    $agreements = Doctrine_Query::create()
+                        ->select('a.id')
+                        ->from('Agreement a')
+                        ->fetchArray();
+
+                    for($i = 0;$i < count($agreements);$i++){
+                        $a_complete = new AgreementComplete();
+                        $a_complete->setUserId($usernameDoctrine->get('id'))
+                            ->setAgreementId($agreements[$i]['id'])
+                            ->save();
+                    }
+                }
+
                 $this->getUser()->signIn($usernameDoctrine, 1);
 
                 if($this->isSpecialist($usernameDoctrine->get("id"))) {
@@ -651,22 +674,8 @@ class apiActions extends sfActions
             $deviceToken = Doctrine_Query::create()
                 ->select("dt.*")
                 ->from("DeviceTokens dt")
-                ->where("dt.user_id = " . $user_id)
+                ->where("dt.user_id = " . $question["user_id"])
                 ->fetchArray();
-            if ($deviceToken) {
-                $tokens = array();
-                for ($i = 0; $i < count($deviceToken); $i++) {
-                    array_push($tokens, $deviceToken[$i]["token"]);
-                }
-                $json = $this->pushNotifications($tokens,
-                    "TITLE",
-                    $body,
-                    array(
-                        "kek" => "kek1"
-                    )
-                );
-
-            }
         } else {
             $specialist_user_id = $question->getSpecialists()[0]["user_id"];
             $deviceToken = Doctrine_Query::create()
@@ -674,20 +683,26 @@ class apiActions extends sfActions
                 ->from("DeviceTokens dt")
                 ->where("dt.user_id = " . $specialist_user_id)
                 ->fetchArray();
-            if ($deviceToken) {
-                $tokens = array();
-                for ($i = 0; $i < count($deviceToken); $i++) {
-                    array_push($tokens, $deviceToken[$i]["token"]);
-                }
-                $json = $this->pushNotifications($tokens,
-                    "TITLE",
-                    $body,
-                    array(
-                        "kek" => "kek1"
-                    )
-                );
-
+        }
+        $userMessage = $this->getUser()->getAccount();
+        if ($deviceToken) {
+            $tokens = array();
+            for ($i = 0; $i < count($deviceToken); $i++) {
+                array_push($tokens, $deviceToken[$i]["token"]);
             }
+            $json = ProjectUtils::pushNotifications($tokens,
+                array(
+                    "type" => "message",
+                    "id" => $answer->getId(),
+                    "user_id" => $user_id,
+                    "chat_id" => $question["id"],
+                    "created_at" => $question["created_at"],
+                    "message" => "$body",
+                    "title" => "Новое сообщение",
+                    "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
+                    "isSpecialist" => false
+                )
+            );
         }
 
         return $this->renderText(json_encode(array(
@@ -1296,56 +1311,20 @@ class apiActions extends sfActions
         return $user_id_by_q_id;
     }
 
-    public function pushNotifications($tokens = array(""), $title = "", $message = "", $data = array()){
-        $method = 'http://192.168.2.7:8103/gorush/api/push';
-        $params = array(
-            "notifications" => array(
-                array(
-                    "tokens" => $tokens,
-                    "data" => $data,
-                    "platform" => 1,
-                    "title" => "IOS::" . $title,
-                    "message" => $message,
-                    "topic" => "company.atma.vrachrb",
-                    "priority" => "high",
-                    "content_available" => true,
-                    "push_type" => "background",
-                ),
-                array(
-                    "tokens" => $tokens,
-                    "data" => $data,
-                    "platform" => 2,
-                    "title" => "ANDROID::" . $title,
-                    "message" => $message,
-                    "topic" => "company.atma.vrachrb",
-                    "priority" => "high",
-                    "content_available" => true,
-                    "push_type" => "background",
-                ),
-                array(
-                    "tokens" => $tokens,
-                    "huawei_data" => json_encode($data),
-                    "platform" => 3,
-                    "title" => "HUAWEI::" . $title,
-                    "message" => $message,
-                    "topic" => "company.atma.vrachrb",
-                    "priority" => "high",
-                    "content_available" => true,
-                    "push_type" => "background",
-                )
-            )
-        );
-//        return $params;
-        return json_decode(ProjectUtils::post($method, json_encode($params)), true);
-    }
-
     public function executeTest(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
-        $json = $this->pushNotifications(array("cO-5E-eBSwqr0RWVvXrMLg:APA91bFILUHgUstYw2mfmKGk-x9VwOnR3rc2XQr6P3gpDoqweP1tMnWWDjdOBC_QaexB4P7z66QNDSPk9siEg4Y_Kn4JI8gPovaf4QXdVWKESEr6LtViCt3NPFjgbxOk_vqp16mu2rSA"),
-            "TITLE","MESSAGE",array(
-                "kek" => "kek1"
+        $json = ProjectUtils::pushNotifications(array("fiRiCtbGRDCZQPFrneB3a5:APA91bFOAjYvLjtpsabQrbaF_AHca6BsDN_O1bwjONuuNrUfVSaqgrt65tw_l8se2oO5_fUyh1d9FcbwsUEI66926jUZ2ZNJhHDsMwhesKvVx30As9hNYFL79DUb9Nv6gw5FyhRneOYO"),
+            array(
+                "id" => 172,
+                "user_id" => 213,
+                "chat_id" => 1,
+                "created_at" => "16.05.2003",
+                "message" => "MESSAGE",
+                "title" => "TITLE",
+                "specialist_name" => "EBLAN",
+                "isSpecialist" => false
             ));
 //        $myUser = $this->getUser()->getAccount();
 //

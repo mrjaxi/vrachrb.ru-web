@@ -150,6 +150,49 @@ class ProjectUtils
         }
     }
 
+    public static function pushNotifications($tokens = array(""), $data = array()){
+        $method = 'http://192.168.2.7:8103/gorush/api/push';
+        $params = array(
+            "notifications" => array(
+                array(
+                    "tokens" => $tokens,
+                    "data" => $data,
+                    "platform" => 1,
+
+                    "topic" => "company.atma.vrachrb",
+                    "priority" => "high",
+                    "content_available" => true,
+                    "push_type" => "background",
+                    "pushNotification" => true
+                ),
+                array(
+                    "tokens" => $tokens,
+                    "data" => $data,
+                    "platform" => 2,
+//                    "message" => "MESSAGE",
+//                    "title" => "TITLE",
+
+                    "topic" => "company.atma.vrachrb",
+                    "priority" => "high",
+                    "content_available" => true,
+                    "push_type" => "background",
+                    "pushNotification" => true
+                ),
+                array(
+                    "tokens" => $tokens,
+                    "huawei_data" => json_encode($data),
+                    "platform" => 3,
+
+                    "topic" => "company.atma.vrachrb",
+                    "priority" => "high",
+                    "content_available" => true,
+                    "push_type" => "background",
+                    "pushNotification" => true
+                )
+            )
+        );
+        return json_decode(ProjectUtils::post($method, json_encode($params)), true);
+    }
 }
 
 

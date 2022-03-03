@@ -629,6 +629,20 @@ CREATE TABLE `notice` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=564;
 
 
+# Dump of table device_tokens
+# ------------------------------------------------------------
+
+CREATE TABLE `device_tokens` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `type` bigint(20),
+  `token` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id_idx` (`user_id`),
+  CONSTRAINT `device_tokens_user_id_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AVG_ROW_LENGTH=564;
+
+
 
 # Dump of table page
 # ------------------------------------------------------------

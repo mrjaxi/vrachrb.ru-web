@@ -610,6 +610,34 @@ class doctor_accountActions extends sfActions
             $this->result = true;
             $this->question_id = $q_id;
           }
+            $question = Doctrine::getTable('Question')->findOneBy("id", $q_id);
+          $userMessage = Doctrine::getTable('User')->findOneBy("id", $request_answer['user_id']);
+
+            $deviceToken = Doctrine_Query::create()
+                ->select("dt.*")
+                ->from("DeviceTokens dt")
+                ->where("dt.user_id = " . $question["user_id"])
+                ->fetchArray();
+            if ($deviceToken && !$request->getParameter('open') && !$request->getParameter('close')) {
+                $tokens = array();
+                for ($i = 0; $i < count($deviceToken); $i++) {
+                    array_push($tokens, $deviceToken[$i]["token"]);
+                }
+                $json = ProjectUtils::pushNotifications($tokens,
+                    array(
+                        "type" => "message",
+                        "id" => 172,
+                        "user_id" => $request_answer['user_id'],
+                        "chat_id" => $question["id"],
+                        "created_at" => $question["created_at"],
+                        "message" => $request_answer["body"],
+                        "title" => "Новое сообщение",
+                        "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
+                        "images" => $request_answer["attachment"],
+                        "isSpecialist" => true
+                    )
+                );
+            }
         }
 
         //      open_dialog

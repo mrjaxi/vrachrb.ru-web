@@ -15,6 +15,7 @@ Deploy to dev:
   script:
     - rsync --exclude '.git' --exclude 'config/databases.yml' --exclude 'symfony' --exclude '.gitlab-ci.yml' -avzh . /www/vrachrb.atmadev.ru
     - cd /www/vrachrb.atmadev.ru
+    - ./symfony doctrine:migrate
     - ./symfony cc
 
 #Deploy to prod:

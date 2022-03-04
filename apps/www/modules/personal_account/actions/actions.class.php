@@ -125,12 +125,12 @@ class personal_accountActions extends sfActions
                   $json = ProjectUtils::pushNotifications($tokens,
                       array(
                           "type" => "message",
-                          "id" => 172,
                           "user_id" => $request_answer['user_id'],
                           "chat_id" => $question["id"],
                           "created_at" => $question["created_at"],
-                          "message" => $request_answer["body"],
                           "title" => "Новое сообщение",
+                          "message" => $request_answer["body"],
+                          "image" => $request_answer["attachment"],
                           "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
                           "isSpecialist" => false
                       )

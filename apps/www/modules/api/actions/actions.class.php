@@ -693,12 +693,12 @@ class apiActions extends sfActions
             $json = ProjectUtils::pushNotifications($tokens,
                 array(
                     "type" => "message",
-                    "id" => $answer->getId(),
                     "user_id" => $user_id,
                     "chat_id" => $question["id"],
                     "created_at" => $question["created_at"],
-                    "message" => "$body",
                     "title" => "Новое сообщение",
+                    "message" => "$body",
+                    "image" => $answer->getAttachment(),
                     "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
                     "isSpecialist" => false
                 )

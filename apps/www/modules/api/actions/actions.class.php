@@ -76,10 +76,10 @@ class apiActions extends sfActions
 
         $data = $this->getPostData();
         if ($data) {
-            $token = (string) $data["token"];
+            $token = $data["token"];
             $type  = (int) $data["type"];
         } else {
-            $token = (string) $request->getPostParameter("token");
+            $token = $request->getPostParameter("token");
             $type  = (int) $request->getPostParameter("type");
         }
         if(!$token || !$type){
@@ -88,22 +88,11 @@ class apiActions extends sfActions
             )));
         }
 
-        $deviceToken = Doctrine_Query::create()
-            ->select("dt.*")
-            ->from("DeviceTokens dt")
-            ->where("dt.user_id = " . $myUser->getId() . " AND dt.type = " . $type)
-            ->fetchArray()[0];
+        $deviceToken = Doctrine::getTable('DeviceTokens')->findOneBy("token", $token);
         if($deviceToken){
-            // Перезапись токена
-            $device_token = Doctrine::getTable('DeviceTokens')->findBy("user_id", $myUser->getId());
-            if(count($device_token) == 1)
-                $device_token[0]["token"] = $token;
-            else
-                for($i = 0; $i < count($device_token); $i++)
-                    if($device_token[$i]["type"] == $type)
-                        $device_token[$i]["token"] = $token;
-
-            $device_token->save();
+            // Перезапись юзера
+            $deviceToken["user_id"] = $myUser->getId();
+            $deviceToken->save();
         } else {
             // Создание нового токена девайса
             $device_token = new DeviceTokens();
@@ -121,6 +110,25 @@ class apiActions extends sfActions
     public function executeSignOut($request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
+
+        if (!$this->getUser()->isAuthenticated()){
+            return $this->renderText(json_encode(array(
+                "error" => "Не аутентифицирован",
+            )));
+        }
+        $token = $request->getGetParameter("token");
+        if(!$token){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите параметры 'token'"
+            )));
+        }
+//        $user = $this->getUser()->getAccount();
+
+        $deviceToken = Doctrine::getTable('DeviceTokens')->findOneBy("token", $token);
+        if($deviceToken)
+        {
+            $deviceToken->delete();
+        }
 
         $this->getUser()->signOut();
         if (!$this->getUser()->isAuthenticated())
@@ -700,7 +708,7 @@ class apiActions extends sfActions
                     "message" => "$body",
                     "image" => $answer->getAttachment(),
                     "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
-                    "isSpecialist" => false
+                    "isSpecialist" => $this->isSpecialist($user_id)
                 )
             );
         }

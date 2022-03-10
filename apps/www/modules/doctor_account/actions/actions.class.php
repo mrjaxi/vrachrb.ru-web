@@ -611,7 +611,7 @@ class doctor_accountActions extends sfActions
             $this->question_id = $q_id;
           }
             $question = Doctrine::getTable('Question')->findOneBy("id", $q_id);
-          $userMessage = Doctrine::getTable('User')->findOneBy("id", $request_answer['user_id']);
+            $userMessage = Doctrine::getTable('User')->findOneBy("id", $request_answer['user_id']);
 
             $deviceToken = Doctrine_Query::create()
                 ->select("dt.*")
@@ -624,6 +624,8 @@ class doctor_accountActions extends sfActions
                     array_push($tokens, $deviceToken[$i]["token"]);
                 }
                 $json = ProjectUtils::pushNotifications($tokens,
+                    $request_answer["body"],
+                    "Новое сообщение",
                     array(
                         "type" => "message",
                         "user_id" => $request_answer['user_id'],
@@ -632,8 +634,9 @@ class doctor_accountActions extends sfActions
                         "title" => "Новое сообщение",
                         "message" => $request_answer["body"],
                         "image" => $request_answer["attachment"],
-                        "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
-                        "isSpecialist" => true
+                        "spec_name" => $userMessage["first_name"] . " " . $userMessage["second_name"],
+                        "isSpecialist" => true,
+                        "speciality" => $question->getSpecialtys()[0]->getTitle(),
                     )
                 );
             }

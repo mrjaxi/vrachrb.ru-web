@@ -150,7 +150,7 @@ class ProjectUtils
         }
     }
 
-    public static function pushNotifications($tokens = array(""), $data = array()){
+    public static function pushNotifications($tokens = array(""), $message = "Новое уведомление", $title = "Уведомление", $data = array()){
         $method = 'http://192.168.2.7:8103/gorush/api/push';
         $params = array(
             "notifications" => array(
@@ -158,19 +158,18 @@ class ProjectUtils
                     "tokens" => $tokens,
                     "data" => $data,
                     "platform" => 1,
+                    "message" => $message,
+                    "title" => $title,
 
                     "topic" => "company.atma.vrachrb",
                     "priority" => "high",
                     "content_available" => true,
-                    "push_type" => "background",
-                    "pushNotification" => true
+                    "pushNotification" => true,
                 ),
                 array(
                     "tokens" => $tokens,
                     "data" => $data,
                     "platform" => 2,
-//                    "message" => "MESSAGE",
-//                    "title" => "TITLE",
 
                     "topic" => "company.atma.vrachrb",
                     "priority" => "high",

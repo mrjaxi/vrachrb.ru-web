@@ -144,6 +144,8 @@ class Page extends BasePage
           switch ($event){
               case "question":
                   $json = ProjectUtils::pushNotifications($tokens,
+                      "Вам задали новый вопрос! Ответьте на него в ближайшее время",
+                      "Новый вопрос",
                       array(
                           "type" => $event,
                           "message" => "Вам задали новый вопрос! Ответьте на него в ближайшее время",
@@ -153,6 +155,8 @@ class Page extends BasePage
                   break;
               case "review":
                   $json = ProjectUtils::pushNotifications($tokens,
+                      "Вам оставили новый отзыв, проверьте его в личном кабинете на сайте vrachrb.ru",
+                      "Новый отзыв",
                       array(
                           "type" => $event,
                           "message" => "Вам оставили новый отзыв, проверьте его в личном кабинете на сайте vrachrb.ru",
@@ -162,6 +166,8 @@ class Page extends BasePage
                   break;
               case "closed":
                   $json = ProjectUtils::pushNotifications($tokens,
+                      "Врач закрыл вопрос, поставьте ему оценку за оказанную усулугу, пожалуйста. Спасибо, что пользуетесь нашим сервисом",
+                      "Вопрос закрыт",
                       array(
                           "type" => $event,
                           "message" => "Врач закрыл вопрос, поставьте ему оценку за оказанную усулугу, пожалуйста. Спасибо, что пользуетесь нашим сервисом",
@@ -171,9 +177,11 @@ class Page extends BasePage
                   break;
               case "resume":
                   $json = ProjectUtils::pushNotifications($tokens,
+                      "Врач возобновил беседу по вопросу, проверьте чат",
+                      "Беседа возобновлена",
                       array(
                           "type" => $event,
-                          "message" => "Врач возобновил беседу по вопросу, проверьте чат.",
+                          "message" => "Врач возобновил беседу по вопросу, проверьте чат",
                           "title" => "Беседа возобновлена"
                       )
                   );

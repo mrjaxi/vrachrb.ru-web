@@ -698,7 +698,7 @@ class apiActions extends sfActions
             for ($i = 0; $i < count($deviceToken); $i++) {
                 array_push($tokens, $deviceToken[$i]["token"]);
             }
-            $json = ProjectUtils::pushNotifications($tokens,
+            $json = ProjectUtils::pushNotifications($tokens, "$body", "Новое сообщение",
                 array(
                     "type" => "message",
                     "user_id" => $user_id,
@@ -707,8 +707,9 @@ class apiActions extends sfActions
                     "title" => "Новое сообщение",
                     "message" => "$body",
                     "image" => $answer->getAttachment(),
-                    "name" => $userMessage["first_name"] . " " . $userMessage["second_name"] . " " . $userMessage["middle_name"],
-                    "isSpecialist" => $this->isSpecialist($user_id)
+                    "spec_name" => $userMessage["first_name"] . " " . $userMessage["second_name"],
+                    "isSpecialist" => $this->isSpecialist($user_id),
+                    "speciality" => $this->isSpecialist($user_id) ? $question->getSpecialtys()[0]->getTitle() : "",
                 )
             );
         }
@@ -1323,17 +1324,20 @@ class apiActions extends sfActions
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
 
-        $json = ProjectUtils::pushNotifications(array("fiRiCtbGRDCZQPFrneB3a5:APA91bFOAjYvLjtpsabQrbaF_AHca6BsDN_O1bwjONuuNrUfVSaqgrt65tw_l8se2oO5_fUyh1d9FcbwsUEI66926jUZ2ZNJhHDsMwhesKvVx30As9hNYFL79DUb9Nv6gw5FyhRneOYO"),
-            array(
-                "id" => 172,
-                "user_id" => 213,
-                "chat_id" => 1,
-                "created_at" => "16.05.2003",
-                "message" => "MESSAGE",
-                "title" => "TITLE",
-                "specialist_name" => "EBLAN",
-                "isSpecialist" => false
-            ));
+//        $json = ProjectUtils::pushNotifications(array("5542eee43bb3f94fac82adbce44b75d6eca5705fb75efb3bd931650feb771abd"),
+////        "fiRiCtbGRDCZQPFrneB3a5:APA91bFOAjYvLjtpsabQrbaF_AHca6BsDN_O1bwjONuuNrUfVSaqgrt65tw_l8se2oO5_fUyh1d9FcbwsUEI66926jUZ2ZNJhHDsMwhesKvVx30As9hNYFL79DUb9Nv6gw5FyhRneOYO"),
+//            array(
+//                "type" => "message",
+//                "user_id" => 14116,
+//                "chat_id" => 14,
+//                "created_at" => "16.05.2003",
+//                "message" => "data_MESSAGE",
+//                "title" => "data_TITLE",
+//                "image" => "",
+//                "specialist_name" => "EBLAN",
+//                "isSpecialist" => false,
+//                "pushNotification" => true
+//            ));
 //        $myUser = $this->getUser()->getAccount();
 //
 //        $deviceToken = Doctrine_Query::create()
@@ -1351,9 +1355,11 @@ class apiActions extends sfActions
 //
 //        $question = Doctrine::getTable('Question')->findOneBy("id", 13);
 
+        $question = Doctrine::getTable('Question')->findOneBy("id", 1);
+
         return $this->renderText(json_encode(
             $response = array(
-                "json" => $json
+                "specialty" => $question->getSpecialtys()[0]->getTitle()
 //                "tokens" => $tokens,
 //                "specUser" => $question->getSpecialists()[0]["user_id"]
             )

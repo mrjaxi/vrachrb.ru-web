@@ -1282,7 +1282,7 @@ class apiActions extends sfActions
         $CurrentConnection->insert($Table,$values);
     }
 
-    public function isSpecialist($user_id){
+    public static function isSpecialist($user_id){
         $isSpecialist = Doctrine_Query::create()
             ->select("s.specialty_id, s.rating, s.answers_count, s.about")
             ->from("Specialist s")
@@ -1359,7 +1359,7 @@ class apiActions extends sfActions
 
         return $this->renderText(json_encode(
             $response = array(
-                "specialty" => $question->getSpecialtys()[0]->getTitle()
+                "specialty" => $question->getSpecialists()[0]->getUser()->getFirstName()
 //                "tokens" => $tokens,
 //                "specUser" => $question->getSpecialists()[0]["user_id"]
             )

@@ -143,13 +143,18 @@ class Page extends BasePage
           }
           switch ($event){
               case "question":
+                  $question = Doctrine::getTable('Question')->findOneBy("id", $inner_id);
                   $json = ProjectUtils::pushNotifications($tokens,
                       "Вам задали новый вопрос! Ответьте на него в ближайшее время",
                       "Новый вопрос",
                       array(
                           "type" => $event,
                           "message" => "Вам задали новый вопрос! Ответьте на него в ближайшее время",
-                          "title" => "Новый вопрос"
+                          "title" => "Новый вопрос",
+
+                          "chat_id" => $inner_id,
+                          "user_id" => $question->getUser()->getId(),
+                          "spec_name" => $question->getUser()->getFirstName() . " " . $question->getUser()->getSecondName(),
                       )
                   );
                   break;
@@ -165,24 +170,36 @@ class Page extends BasePage
                   );
                   break;
               case "closed":
+                  $question = Doctrine::getTable('Question')->findOneBy("id", $inner_id);
                   $json = ProjectUtils::pushNotifications($tokens,
                       "Врач закрыл вопрос, поставьте ему оценку за оказанную усулугу, пожалуйста. Спасибо, что пользуетесь нашим сервисом",
                       "Вопрос закрыт",
                       array(
                           "type" => $event,
                           "message" => "Врач закрыл вопрос, поставьте ему оценку за оказанную усулугу, пожалуйста. Спасибо, что пользуетесь нашим сервисом",
-                          "title" => "Вопрос закрыт"
+                          "title" => "Вопрос закрыт",
+
+                          "chat_id" => $inner_id,
+                          "user_id" => $question->getUser()->getId(),
+                          "spec_name" => $question->getSpecialists()[0]->getUser()->getFirstName() . " " . $question->getSpecialists()[0]->getUser()->getSecondName(),
+                          "speciality" => $question->getSpecialtys()[0]->getTitle(),
                       )
                   );
                   break;
               case "resume":
+                  $question = Doctrine::getTable('Question')->findOneBy("id", $inner_id);
                   $json = ProjectUtils::pushNotifications($tokens,
-                      "Врач возобновил беседу по вопросу, проверьте чат",
+                      "Врач возобновил беседу по вашему вопросу, проверьте чат",
                       "Беседа возобновлена",
                       array(
                           "type" => $event,
                           "message" => "Врач возобновил беседу по вопросу, проверьте чат",
-                          "title" => "Беседа возобновлена"
+                          "title" => "Беседа возобновлена",
+
+                          "chat_id" => $inner_id,
+                          "user_id" => $question->getUser()->getId(),
+                          "spec_name" => $question->getSpecialists()[0]->getUser()->getFirstName() . " " . $question->getSpecialists()[0]->getUser()->getSecondName(),
+                          "speciality" => $question->getSpecialtys()[0]->getTitle(),
                       )
                   );
                   break;

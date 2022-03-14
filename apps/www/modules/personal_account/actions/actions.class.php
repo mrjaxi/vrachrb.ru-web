@@ -109,6 +109,7 @@ class personal_accountActions extends sfActions
             }
 
               $question = Doctrine::getTable('Question')->findOneBy("id", $q_id);
+              $anonymous = $question->getIsAnonymous();
               $userMessage = Doctrine::getTable('User')->findOneBy("id", $request_answer['user_id']);
 
 
@@ -134,8 +135,9 @@ class personal_accountActions extends sfActions
                           "title" => "Новое сообщение",
                           "message" => $request_answer["body"],
                           "image" => $request_answer["attachment"],
-                          "first_name" => $userMessage["first_name"],
-                          "second_name" => $userMessage["second_name"],
+                          "first_name" => $anonymous ? "Анонимно" : $userMessage["first_name"],
+                          "second_name" => $anonymous ? "" : $userMessage["second_name"],
+                          "isAnonymous" => $anonymous,
                           "isSpecialist" => false,
                           "speciality" => "",
                       )

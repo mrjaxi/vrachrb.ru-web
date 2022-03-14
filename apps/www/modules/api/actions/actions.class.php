@@ -698,21 +698,41 @@ class apiActions extends sfActions
             for ($i = 0; $i < count($deviceToken); $i++) {
                 array_push($tokens, $deviceToken[$i]["token"]);
             }
-            $json = ProjectUtils::pushNotifications($tokens, "$body", "Новое сообщение",
-                array(
-                    "type" => "message",
-                    "user_id" => $user_id,
-                    "chat_id" => $question["id"],
-                    "created_at" => $question["created_at"],
-                    "title" => "Новое сообщение",
-                    "message" => "$body",
-                    "image" => $answer->getAttachment(),
-                    "first_name" => $userMessage["first_name"],
-                    "second_name" => $userMessage["second_name"],
-                    "isSpecialist" => $this->isSpecialist($user_id),
-                    "speciality" => $this->isSpecialist($user_id) ? $question->getSpecialtys()[0]->getTitle() : "",
-                )
-            );
+            if($isSpecialist) {
+                $json = ProjectUtils::pushNotifications($tokens, "$body", "Новое сообщение",
+                    array(
+                        "type" => "message",
+                        "user_id" => $user_id,
+                        "chat_id" => $question["id"],
+                        "created_at" => $question["created_at"],
+                        "title" => "Новое сообщение",
+                        "message" => "$body",
+                        "image" => $answer->getAttachment(),
+                        "first_name" => $userMessage["first_name"],
+                        "second_name" => $userMessage["second_name"],
+                        "isSpecialist" => $isSpecialist,
+                        "speciality" => $isSpecialist ? $question->getSpecialtys()[0]->getTitle() : "",
+                    )
+                );
+            } else {
+                $anonymous = $question->getIsAnonymous();
+                $json = ProjectUtils::pushNotifications($tokens, "$body", "Новое сообщение",
+                    array(
+                        "type" => "message",
+                        "user_id" => $user_id,
+                        "chat_id" => $question["id"],
+                        "created_at" => $question["created_at"],
+                        "title" => "Новое сообщение",
+                        "message" => "$body",
+                        "image" => $answer->getAttachment(),
+                        "first_name" => $anonymous ? "Анонимно" : $userMessage["first_name"],
+                        "second_name" =>  $anonymous ? "" : $userMessage["second_name"],
+                        "isAnonymous" => $anonymous,
+                        "isSpecialist" => $isSpecialist,
+                        "speciality" => $isSpecialist ? $question->getSpecialtys()[0]->getTitle() : "",
+                    )
+                );
+            }
         }
 
         return $this->renderText(json_encode(array(
@@ -1360,7 +1380,7 @@ class apiActions extends sfActions
 
         return $this->renderText(json_encode(
             $response = array(
-                "specialty" => $question->getSpecialists()[0]->getUser()->getFirstName()
+                "specialty" => $question->getIsAnonymous()
 //                "tokens" => $tokens,
 //                "specUser" => $question->getSpecialists()[0]["user_id"]
             )

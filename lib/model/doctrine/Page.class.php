@@ -144,6 +144,7 @@ class Page extends BasePage
           switch ($event){
               case "question":
                   $question = Doctrine::getTable('Question')->findOneBy("id", $inner_id);
+                  $anonymous = $question->getIsAnonymous();
                   $json = ProjectUtils::pushNotifications($tokens,
                       "Вам задали новый вопрос! Ответьте на него в ближайшее время",
                       "Новый вопрос",
@@ -154,8 +155,9 @@ class Page extends BasePage
 
                           "chat_id" => $inner_id,
                           "user_id" => $question->getUser()->getId(),
-                          "first_name" => $question->getUser()->getFirstName(),
-                          "second_name" => $question->getUser()->getSecondName(),
+                          "first_name" => $anonymous ? "Анонимно" : $question->getUser()->getFirstName(),
+                          "second_name" => $anonymous ? "" : $question->getUser()->getSecondName(),
+                          "isAnonymous" => $anonymous,
                       )
                   );
                   break;

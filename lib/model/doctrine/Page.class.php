@@ -154,7 +154,8 @@ class Page extends BasePage
 
                           "chat_id" => $inner_id,
                           "user_id" => $question->getUser()->getId(),
-                          "spec_name" => $question->getUser()->getFirstName() . " " . $question->getUser()->getSecondName(),
+                          "first_name" => $question->getUser()->getFirstName(),
+                          "second_name" => $question->getUser()->getSecondName(),
                       )
                   );
                   break;
@@ -181,7 +182,8 @@ class Page extends BasePage
 
                           "chat_id" => $inner_id,
                           "user_id" => $question->getUser()->getId(),
-                          "spec_name" => $question->getSpecialists()[0]->getUser()->getFirstName() . " " . $question->getSpecialists()[0]->getUser()->getSecondName(),
+                          "first_name" => $question->getSpecialists()[0]->getUser()->getFirstName(),
+                          "second_name" => $question->getSpecialists()[0]->getUser()->getSecondName(),
                           "speciality" => $question->getSpecialtys()[0]->getTitle(),
                       )
                   );

@@ -634,7 +634,8 @@ class doctor_accountActions extends sfActions
                         "title" => "Новое сообщение",
                         "message" => $request_answer["body"],
                         "image" => $request_answer["attachment"],
-                        "spec_name" => $userMessage["first_name"] . " " . $userMessage["second_name"],
+                        "first_name" => $userMessage["first_name"],
+                        "second_name" => $userMessage["second_name"],
                         "isSpecialist" => true,
                         "speciality" => $question->getSpecialtys()[0]->getTitle(),
                     )

@@ -707,7 +707,8 @@ class apiActions extends sfActions
                     "title" => "Новое сообщение",
                     "message" => "$body",
                     "image" => $answer->getAttachment(),
-                    "spec_name" => $userMessage["first_name"] . " " . $userMessage["second_name"],
+                    "first_name" => $userMessage["first_name"],
+                    "second_name" => $userMessage["second_name"],
                     "isSpecialist" => $this->isSpecialist($user_id),
                     "speciality" => $this->isSpecialist($user_id) ? $question->getSpecialtys()[0]->getTitle() : "",
                 )

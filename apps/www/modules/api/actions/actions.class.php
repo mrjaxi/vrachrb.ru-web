@@ -89,19 +89,28 @@ class apiActions extends sfActions
         }
 
         $deviceToken = Doctrine::getTable('DeviceTokens')->findOneBy("token", $token);
-        if($deviceToken){
-            // Перезапись юзера
-            $deviceToken["user_id"] = $myUser->getId();
-            $deviceToken->save();
+        if ($this->getUser()->isAuthenticated()) {
+            if ($deviceToken) {
+                // Перезапись юзера
+                $deviceToken["user_id"] = $myUser->getId();
+                $deviceToken->save();
+            } else {
+                // Создание нового токена девайса
+                $device_token = new DeviceTokens();
+                $device_token->setUserId($myUser->getId())
+                    ->setType($type)
+                    ->setToken($token)
+                    ->save();
+            }
         } else {
-            // Создание нового токена девайса
-            $device_token = new DeviceTokens();
-            $device_token->setUserId($myUser->getId())
-                ->setType($type)
-                ->setToken($token)
-                ->save();
+            if (!$deviceToken) {
+                // Создание нового токена девайса без userId
+                $device_token = new DeviceTokens();
+                $device_token->setType($type)
+                    ->setToken($token)
+                    ->save();
+            }
         }
-
         return $this->renderText(json_encode(array(
             "response" => "Устройство успешно добавлено"
         )));
@@ -116,19 +125,19 @@ class apiActions extends sfActions
                 "error" => "Не аутентифицирован",
             )));
         }
-        $token = $request->getGetParameter("token");
-        if(!$token){
-            return $this->renderText(json_encode(array(
-                "error" => "Введите параметры 'token'"
-            )));
-        }
+//        $token = $request->getGetParameter("token");
+//        if(!$token){
+//            return $this->renderText(json_encode(array(
+//                "error" => "Введите параметры 'token'"
+//            )));
+//        }
 //        $user = $this->getUser()->getAccount();
 
-        $deviceToken = Doctrine::getTable('DeviceTokens')->findOneBy("token", $token);
-        if($deviceToken)
-        {
-            $deviceToken->delete();
-        }
+//        $deviceToken = Doctrine::getTable('DeviceTokens')->findOneBy("token", $token);
+//        if($deviceToken)
+//        {
+//            $deviceToken->delete();
+//        }
 
         $this->getUser()->signOut();
         if (!$this->getUser()->isAuthenticated())
@@ -1013,7 +1022,7 @@ class apiActions extends sfActions
             else
                 $email = $request->getPostParameter('email');
 
-            if ($email != '') {
+            if ($email) {
                 $user = Doctrine::getTable('User')->findOneByEmail($email);
                 if ($user) {
                     if ($user->getIsActive() == 1) {
@@ -1023,7 +1032,7 @@ class apiActions extends sfActions
                         $user->save();
 
                         $message = Swift_Message::newInstance()
-                            ->setFrom('noreply@vrachrb.ru') //. str_replace('www.', '', $request->getHost()))
+                            ->setFrom('noreply@' . $request->getHost()) //. str_replace('www.', '', $request->getHost()))
                             ->setContentType('text/html; charset=UTF-8')
                             ->setTo($user->getEmail())
                             ->setSubject('Восстановление пароля на сайте ' . $request->getHost())

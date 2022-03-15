@@ -634,8 +634,8 @@ CREATE TABLE `notice` (
 
 CREATE TABLE `device_tokens` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) NOT NULL,
-  `type` bigint(20),
+  `user_id` bigint(20) DEFAULT NULL,
+  `type` bigint(20) NOT NULL,
   `token` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id_idx` (`user_id`),

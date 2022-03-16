@@ -15,7 +15,7 @@ abstract class BaseDeviceTokensFormFilter extends BaseFormFilterDoctrine
     $this->setWidgets(array(
       'user_id' => new sfWidgetFormDoctrineChoice(array('model' => $this->getRelatedModelName('User'), 'add_empty' => true)),
       'token'   => new sfWidgetFormFilterInput(array('with_empty' => false)),
-      'type'    => new sfWidgetFormFilterInput(),
+      'type'    => new sfWidgetFormFilterInput(array('with_empty' => false)),
     ));
 
     $this->setValidators(array(

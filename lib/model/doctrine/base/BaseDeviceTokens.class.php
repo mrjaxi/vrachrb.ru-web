@@ -31,7 +31,7 @@ abstract class BaseDeviceTokens extends sfDoctrineRecord
         $this->setTableName('device_tokens');
         $this->hasColumn('user_id', 'integer', null, array(
              'type' => 'integer',
-             'notnull' => true,
+             'notnull' => false,
              ));
         $this->hasColumn('token', 'string', 255, array(
              'type' => 'string',
@@ -40,7 +40,7 @@ abstract class BaseDeviceTokens extends sfDoctrineRecord
              ));
         $this->hasColumn('type', 'integer', null, array(
              'type' => 'integer',
-             'notnull' => false,
+             'notnull' => true,
              ));
     }
 

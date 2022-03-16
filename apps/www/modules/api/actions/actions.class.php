@@ -67,11 +67,11 @@ class apiActions extends sfActions
             )));
         }
 
-        if (!$this->getUser()->isAuthenticated()){
-            return $this->renderText(json_encode(array(
-                "error" => "Не аутентифицирован",
-            )));
-        }
+//        if (!$this->getUser()->isAuthenticated()){
+//            return $this->renderText(json_encode(array(
+//                "error" => "Не аутентифицирован",
+//            )));
+//        }
         $myUser = $this->getUser()->getAccount();
 
         $data = $this->getPostData();

@@ -16,16 +16,16 @@ abstract class BaseDeviceTokensForm extends BaseFormDoctrine
   {
     $this->setWidgets(array(
       'id'      => new sfWidgetFormInputHidden(array(), array()),
-      'user_id' => new sfWidgetFormDoctrineChoice(array('model' => $this->getRelatedModelName('User'), 'add_empty' => false), array("required" => true)),
+      'user_id' => new sfWidgetFormDoctrineChoice(array('model' => $this->getRelatedModelName('User'), 'add_empty' => true), array()),
       'token'   => new sfWidgetFormInputText(array(), array("size" => 64, "maxlength" => 255, "required" => true)),
-      'type'    => new sfWidgetFormInputText(array(), array("size" => 8, "maxlength" => 8)),
+      'type'    => new sfWidgetFormInputText(array(), array("size" => 8, "maxlength" => 8, "required" => true)),
     ));
 
     $this->setValidators(array(
       'id'      => new sfValidatorDoctrineChoice(array('model' => $this->getModelName(), 'column' => 'id', 'required' => false)),
-      'user_id' => new sfValidatorDoctrineChoice(array('model' => $this->getRelatedModelName('User'))),
+      'user_id' => new sfValidatorDoctrineChoice(array('model' => $this->getRelatedModelName('User'), 'required' => false)),
       'token'   => new sfValidatorString(array('max_length' => 255)),
-      'type'    => new sfValidatorInteger(array('required' => false)),
+      'type'    => new sfValidatorInteger(),
     ));
 
     $this->widgetSchema->setNameFormat('device_tokens[%s]');

@@ -1055,13 +1055,13 @@ DeviceTokens:
   columns:
     user_id:
       type: integer
-      notnull: true
+      notnull: false
     token:
       type: string(255)
       notnull: true
     type:
       type: integer
-      notnull: false
+      notnull: true
   relations:
     User:
       onDelete: CASCADE

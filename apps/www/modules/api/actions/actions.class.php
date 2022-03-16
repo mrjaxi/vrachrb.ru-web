@@ -103,7 +103,11 @@ class apiActions extends sfActions
                     ->save();
             }
         } else {
-            if (!$deviceToken) {
+            if ($deviceToken) {
+                // Перезапись юзера
+                $deviceToken["user_id"] = null;
+                $deviceToken->save();
+            } else {
                 // Создание нового токена девайса без userId
                 $device_token = new DeviceTokens();
                 $device_token->setType($type)

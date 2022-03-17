@@ -8,54 +8,15 @@ class apiActions extends sfActions
         $myUser = $this->getUser()->getAccount();
         if ($this->getUser()->isAuthenticated())
         {
-            if($this->isSpecialist($myUser->getId())){
-                $specialist = $this->getSpecialist($myUser->getId());
-
-                $response = array(
-                    "response" => true,
-                    "userData" => array(
-                        "auth" => true,
-                        "isSpecialist" => $this->isSpecialist($myUser->getId()),
-                        "first_name" => $myUser->getFirst_name(),
-                        "second_name" => $myUser->getSecond_name(),
-                        "middle_name" => $myUser->getMiddle_name(),
-                        "username" => $myUser->getUsername(),
-                        "gender" => $myUser->getGender(),
-                        "birth_date" => $myUser->getBirth_date(),
-                        "email" => $myUser->getEmail(),
-                        "phone" => $myUser->getPhone(),
-                        "photo" => $myUser->getPhoto(),
-                        "rating" => $specialist["rating"],
-                        "answers_count" => $specialist["answers_count"],
-                    ),
-                );
-            } else {
-                $response = array(
-                    "response" => true,
-                    "userData" => array(
-                        "auth" => true,
-                        "isSpecialist" => $this->isSpecialist($myUser->getId()),
-                        "first_name" => $myUser->getFirst_name(),
-                        "second_name" => $myUser->getSecond_name(),
-                        "middle_name" => $myUser->getMiddle_name(),
-                        "username" => $myUser->getUsername(),
-                        "gender" => $myUser->getGender(),
-                        "birth_date" => $myUser->getBirth_date(),
-                        "email" => $myUser->getEmail(),
-                        "phone" => $myUser->getPhone(),
-                        "photo" => $myUser->getPhoto(),
-                    ),
-                );
-            }
+            return $this->renderText(json_encode(array(
+                "response" => true,
+                "userData" => $this->getUserData($myUser)
+            )));
         } else {
-            $response = array(
+            return $this->renderText(json_encode(array(
                 "response" => false,
-            );
+            )));
         }
-
-        return $this->renderText(json_encode(
-            $response
-        ));
     }
 
     public function executeSaveDeviceToken($request){
@@ -67,11 +28,6 @@ class apiActions extends sfActions
             )));
         }
 
-//        if (!$this->getUser()->isAuthenticated()){
-//            return $this->renderText(json_encode(array(
-//                "error" => "Не аутентифицирован",
-//            )));
-//        }
         $myUser = $this->getUser()->getAccount();
 
         $data = $this->getPostData();
@@ -129,19 +85,6 @@ class apiActions extends sfActions
                 "error" => "Не аутентифицирован",
             )));
         }
-//        $token = $request->getGetParameter("token");
-//        if(!$token){
-//            return $this->renderText(json_encode(array(
-//                "error" => "Введите параметры 'token'"
-//            )));
-//        }
-//        $user = $this->getUser()->getAccount();
-
-//        $deviceToken = Doctrine::getTable('DeviceTokens')->findOneBy("token", $token);
-//        if($deviceToken)
-//        {
-//            $deviceToken->delete();
-//        }
 
         $this->getUser()->signOut();
         if (!$this->getUser()->isAuthenticated())
@@ -233,63 +176,84 @@ class apiActions extends sfActions
                 "agreement" => "Нужно принять соглашения"
             )));
         }
-
-        if (Agreement::agreementCheck($user->getId())) {
-            // Принятие соглашений
-            $agreements = Doctrine_Query::create()
-                ->select('a.id')
-                ->from('Agreement a')
-                ->fetchArray();
-
-            for($i = 0;$i < count($agreements);$i++){
-                $a_complete = new AgreementComplete();
-                $a_complete->setUserId($user->get('id'))
-                    ->setAgreementId($agreements[$i]['id'])
-                    ->save();
-            }
-        }
+        $this->acceptAgreements($user);
 
         $this->getUser()->signIn($user, 1);
 
-        if($this->isSpecialist($user->getId())){
-            $specialist = $this->getSpecialist($user->getId());
+        return $this->renderText(json_encode(array(
+            "auth" => $this->getUser()->isAuthenticated(),
+            "userData" => $this->getUserData($user)
+        )));
+    }
 
+    public function executeSign_apple(sfWebRequest $request)
+    {
+        $this->getResponse()->setHttpHeader('Content-type','application/json');
+        if (!$request->isMethod('post')) {
             return $this->renderText(json_encode(array(
-                "auth" => true,
-                "userData" => array(
-                    "auth" => true,
-                    "isSpecialist" => $this->isSpecialist($user->getId()),
-                    "first_name"   => $user->getFirst_name(),
-                    "second_name"  => $user->getSecond_name(),
-                    "middle_name"  => $user->getMiddle_name(),
-                    "username"     => $user->getUsername(),
-                    "gender"       => $user->getGender(),
-                    "birth_date"   => $user->getBirth_date(),
-                    "email"        => $user->getEmail(),
-                    "phone"        => $user->getPhone(),
-                    "photo"        => $user->getPhoto(),
-                    "rating"       => $specialist["rating"],
-                    "answers_count" => $specialist["answers_count"],
-                ),
-            )));
-        } else {
-            return $this->renderText(json_encode(array(
-                "auth" => true,
-                "userData" => array(
-                    "auth" => true,
-                    "isSpecialist" => $this->isSpecialist($user->getId()),
-                    "first_name"   => $user->getFirst_name(),
-                    "second_name"  => $user->getSecond_name(),
-                    "middle_name"  => $user->getMiddle_name(),
-                    "username"     => $user->getUsername(),
-                    "gender"       => $user->getGender(),
-                    "birth_date"   => $user->getBirth_date(),
-                    "email"        => $user->getEmail(),
-                    "phone"        => $user->getPhone(),
-                    "photo"        => $user->getPhoto(),
-                ),
+                "error" => "Поддерживается только POST запрос.",
             )));
         }
+
+        $data = $this->getPostData();
+        if($data) {
+            $name = $data["name"];
+            $familia = $data["familia"];
+            $gender = $data["gender"];
+            $birth_date = $data["birth_date"];
+            $email = $data["email"];
+            $username = $data["username"];
+        } else {
+            $name = $request->getPostParameter("name");
+            $familia = $request->getPostParameter("familia");
+            $gender = $request->getPostParameter("gender");
+            $birth_date = $request->getPostParameter("birth_date");
+            $email = $request->getPostParameter("email");
+            $username = $request->getPostParameter("username");
+        }
+        if(!$username){
+            return $this->renderText(json_encode(array(
+                "error" => "Введите параметры 'username'"
+            )));
+        }
+
+        $identitys = array(
+            'apple-' . $username,
+            $username,
+        );
+        $user = Doctrine_Query::create()
+            ->select("u.*")
+            ->from("User u")
+            ->whereIn("u.username", $identitys)
+            ->orderBy("(SELECT COUNT(s.id) FROM Specialist s WHERE s.user_id = u.id) DESC")
+            ->fetchOne();
+
+        if (!$user) {
+            if($name && $familia && $gender && $birth_date){
+                $user = new User();
+                $user->setUsername('apple-' . $username)
+                    ->setFirstName($name ? $name : "")
+                    ->setSecondName($familia ? $familia : "")
+                    ->setMiddleName("")
+                    ->setGender($gender)
+                    ->setBirthDate($birth_date);
+                $email ? $user->setEmail($email) : null;
+                $user->save();
+            } else {
+                return $this->renderText(json_encode(array(
+                    "next" => "Зарегистрирутесь с данными 'name', 'familia', 'gender', 'birth_date', 'email'"
+                )));
+            }
+        }
+
+        $this->acceptAgreements($user);
+
+        $this->getUser()->signIn($user, 1);
+
+        return $this->renderText(json_encode(array(
+            "auth" => $this->getUser()->isAuthenticated(),
+            "userData" => $this->getUserData($user)
+        )));
     }
 
     public function executeSignIn(sfWebRequest $request)
@@ -344,40 +308,7 @@ class apiActions extends sfActions
 
                 $this->getUser()->signIn($usernameDoctrine, 1);
 
-                if($this->isSpecialist($usernameDoctrine->get("id"))) {
-                    $specialist = $this->getSpecialist($usernameDoctrine->get("id"));
-
-                    $response = array(
-                        "auth" => true,
-                        "isSpecialist" => $this->isSpecialist($usernameDoctrine->get("id")),
-                        "first_name" => $usernameDoctrine->get("first_name"),
-                        "second_name" => $usernameDoctrine->get("second_name"),
-                        "middle_name" => $usernameDoctrine->get("middle_name"),
-                        "username" => $usernameDoctrine->get("username"),
-                        "gender" => $usernameDoctrine->get("gender"),
-                        "birth_date" => $usernameDoctrine->get("birth_date"),
-                        "email" => $usernameDoctrine->get("email"),
-                        "phone" => $usernameDoctrine->get("phone"),
-                        "photo" => $usernameDoctrine->get("photo"),
-                        "rating" => $specialist["rating"],
-                        "answers_count" => $specialist["answers_count"],
-
-                    );
-                } else {
-                    $response = array(
-                        "auth" => true,
-                        "isSpecialist" => $this->isSpecialist($usernameDoctrine->get("id")),
-                        "first_name" => $usernameDoctrine->get("first_name"),
-                        "second_name" => $usernameDoctrine->get("second_name"),
-                        "middle_name" => $usernameDoctrine->get("middle_name"),
-                        "username" => $usernameDoctrine->get("username"),
-                        "gender" => $usernameDoctrine->get("gender"),
-                        "birth_date" => $usernameDoctrine->get("birth_date"),
-                        "email" => $usernameDoctrine->get("email"),
-                        "phone" => $usernameDoctrine->get("phone"),
-                        "photo" => $usernameDoctrine->get("photo"),
-                    );
-                }
+                $response = $this->getUserData($usernameDoctrine);
 
             } else {
                 $response = array(
@@ -436,8 +367,6 @@ class apiActions extends sfActions
                 'phone' => $params['phone'],
                 'salt' => $salt,
                 'password' => $encryptedPass,
-//                'photo' => '',
-//                'last_login' => '',
                 'password_check' => $rndPasswordCheck,
             ];
 
@@ -445,18 +374,8 @@ class apiActions extends sfActions
             $newUser->save();
 
             $this->getUser()->signIn($newUser, 1);
-            // Принятие соглашений
-            $agreements = Doctrine_Query::create()
-                ->select('a.id')
-                ->from('Agreement a')
-                ->fetchArray();
 
-            for($i = 0;$i < count($agreements);$i++){
-                $a_complete = new AgreementComplete();
-                $a_complete->setUserId($newUser->get('id'))
-                    ->setAgreementId($agreements[$i]['id'])
-                    ->save();
-            }
+            $this->acceptAgreements($newUser);
 
             $response = array(
                 'response' => "Успешная регистрация",
@@ -1354,40 +1273,62 @@ class apiActions extends sfActions
         return $user_id_by_q_id;
     }
 
+    public function acceptAgreements($user){
+        if (Agreement::agreementCheck($user->getId())) {
+            // Принятие соглашений
+            $agreements = Doctrine_Query::create()
+                ->select('a.id')
+                ->from('Agreement a')
+                ->fetchArray();
+
+            for($i = 0;$i < count($agreements);$i++){
+                $a_complete = new AgreementComplete();
+                $a_complete->setUserId($user->get('id'))
+                    ->setAgreementId($agreements[$i]['id'])
+                    ->save();
+            }
+        }
+    }
+
+    public function getUserData($user){
+        if($this->isSpecialist($user->getId())){
+            $specialist = $this->getSpecialist($user->getId());
+
+            return array(
+                "auth" => $this->getUser()->isAuthenticated(),
+                "isSpecialist" => $this->isSpecialist($user->getId()),
+                "first_name"   => $user->getFirst_name(),
+                "second_name"  => $user->getSecond_name(),
+                "middle_name"  => $user->getMiddle_name(),
+                "username"     => $user->getUsername(),
+                "gender"       => $user->getGender(),
+                "birth_date"   => $user->getBirth_date(),
+                "email"        => $user->getEmail(),
+                "phone"        => $user->getPhone(),
+                "photo"        => $user->getPhoto(),
+                "rating"       => $specialist["rating"],
+                "answers_count" => $specialist["answers_count"],
+            );
+        } else {
+            return array(
+                "auth" => $this->getUser()->isAuthenticated(),
+                "isSpecialist" => $this->isSpecialist($user->getId()),
+                "first_name"   => $user->getFirst_name(),
+                "second_name"  => $user->getSecond_name(),
+                "middle_name"  => $user->getMiddle_name(),
+                "username"     => $user->getUsername(),
+                "gender"       => $user->getGender(),
+                "birth_date"   => $user->getBirth_date(),
+                "email"        => $user->getEmail(),
+                "phone"        => $user->getPhone(),
+                "photo"        => $user->getPhoto(),
+            );
+        }
+    }
+
     public function executeTest(sfWebRequest $request)
     {
         $this->getResponse()->setHttpHeader('Content-type','application/json');
-
-//        $json = ProjectUtils::pushNotifications(array("5542eee43bb3f94fac82adbce44b75d6eca5705fb75efb3bd931650feb771abd"),
-////        "fiRiCtbGRDCZQPFrneB3a5:APA91bFOAjYvLjtpsabQrbaF_AHca6BsDN_O1bwjONuuNrUfVSaqgrt65tw_l8se2oO5_fUyh1d9FcbwsUEI66926jUZ2ZNJhHDsMwhesKvVx30As9hNYFL79DUb9Nv6gw5FyhRneOYO"),
-//            array(
-//                "type" => "message",
-//                "user_id" => 14116,
-//                "chat_id" => 14,
-//                "created_at" => "16.05.2003",
-//                "message" => "data_MESSAGE",
-//                "title" => "data_TITLE",
-//                "image" => "",
-//                "specialist_name" => "EBLAN",
-//                "isSpecialist" => false,
-//                "pushNotification" => true
-//            ));
-//        $myUser = $this->getUser()->getAccount();
-//
-//        $deviceToken = Doctrine_Query::create()
-//            ->select("dt.*")
-//            ->from("DeviceTokens dt")
-//            ->where("dt.user_id = " . $myUser->getId())
-//            ->fetchArray();
-//
-//        if($deviceToken){
-//            $tokens = array();
-//            for($i = 0; $i < count($deviceToken); $i++){
-//                array_push($tokens, $deviceToken[$i]["token"]);
-//            }
-//        }
-//
-//        $question = Doctrine::getTable('Question')->findOneBy("id", 13);
 
         $question = Doctrine::getTable('Question')->findOneBy("id", 1);
 

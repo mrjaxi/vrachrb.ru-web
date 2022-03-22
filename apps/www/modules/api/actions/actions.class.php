@@ -199,6 +199,7 @@ class apiActions extends sfActions
         if($data) {
             $name = $data["name"];
             $familia = $data["familia"];
+            $last_name = $data["last_name"];
             $gender = $data["gender"];
             $birth_date = $data["birth_date"];
             $email = $data["email"];
@@ -206,6 +207,7 @@ class apiActions extends sfActions
         } else {
             $name = $request->getPostParameter("name");
             $familia = $request->getPostParameter("familia");
+            $last_name = $request->getPostParameter("last_name");
             $gender = $request->getPostParameter("gender");
             $birth_date = $request->getPostParameter("birth_date");
             $email = $request->getPostParameter("email");
@@ -229,19 +231,19 @@ class apiActions extends sfActions
             ->fetchOne();
 
         if (!$user) {
-            if($name && $familia && $gender && $birth_date){
+            if($name && $familia && $gender && $birth_date && $email){
                 $user = new User();
                 $user->setUsername('apple-' . $username)
-                    ->setFirstName($name ? $name : "")
-                    ->setSecondName($familia ? $familia : "")
-                    ->setMiddleName("")
+                    ->setFirstName($name)
+                    ->setSecondName($familia)
+                    ->setMiddleName($last_name ? $last_name : "")
                     ->setGender($gender)
-                    ->setBirthDate($birth_date);
-                $email ? $user->setEmail($email) : null;
-                $user->save();
+                    ->setBirthDate($birth_date)
+                    ->setEmail($email)
+                ->save();
             } else {
                 return $this->renderText(json_encode(array(
-                    "next" => "Зарегистрирутесь с данными 'name', 'familia', 'gender', 'birth_date', 'email'"
+                    "next" => "Зарегистрирутесь с данными 'name', 'familia', 'last_name', 'gender', 'birth_date', 'email'"
                 )));
             }
         }
@@ -1283,7 +1285,7 @@ class apiActions extends sfActions
 
             for($i = 0;$i < count($agreements);$i++){
                 $a_complete = new AgreementComplete();
-                $a_complete->setUserId($user->get('id'))
+                $a_complete->setUserId($user->getId())
                     ->setAgreementId($agreements[$i]['id'])
                     ->save();
             }

@@ -783,7 +783,7 @@ class apiActions extends sfActions
         $host = $request->getHost();
         for($i = 0;$i < count($agreements);$i++){
             if($agreements[$i]['in_documentation'] == true){
-                $agreements[$i]['url'] = "http://{$host}/agreement/{$agreements[$i]["id"]}/";
+                $agreements[$i]['url'] = "https://{$host}/agreement/{$agreements[$i]["id"]}/";
             }
         }
 

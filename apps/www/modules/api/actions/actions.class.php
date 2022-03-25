@@ -749,9 +749,25 @@ class apiActions extends sfActions
             )));
         }
         if ($this->getUser()->isAuthenticated()){
-            $allSpeciality = Doctrine_Core::getTable('Specialty')->findAll();
+            $allSpeciality = Doctrine_Core::getTable('Specialty')->findAll()->toArray();
+            $delete_id = array();
+            for($i = 0; $i < count($allSpeciality); $i++){
+                $specialists = Doctrine_Query::create()
+                    ->select('s.specialty_id, s.rating, s.answers_count, s.about, u.first_name, u.second_name, u.middle_name, u.photo')
+                    ->from("Specialist s")
+                    ->innerJoin("s.User u ON u.id = s.user_id and s.specialty_id = " . $allSpeciality[$i]["id"])
+                    ->fetchArray();
+                $allSpeciality[$i]["specialists_count"] = count($specialists);
+
+                if(count($specialists) < 1){
+                    array_push($delete_id, $i);
+                }
+            }
+            for($i = 0; $i < count($delete_id); $i++){
+                unset($allSpeciality[$delete_id[$i]]);
+            }
             $response = array(
-                "response" => $allSpeciality->toArray()
+                "response" => array_values($allSpeciality)
             );
         } else {
             $response = array(

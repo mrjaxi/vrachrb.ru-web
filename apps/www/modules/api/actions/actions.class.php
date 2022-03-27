@@ -240,7 +240,7 @@ class apiActions extends sfActions
                     ->setGender($gender)
                     ->setBirthDate($birth_date)
                     ->setEmail($email)
-                ->save();
+                    ->save();
             } else {
                 return $this->renderText(json_encode(array(
                     "next" => "Зарегистрирутесь с данными 'name', 'familia', 'last_name', 'gender', 'birth_date', 'email'"
@@ -796,10 +796,9 @@ class apiActions extends sfActions
             ->from('Agreement a')
             ->fetchArray();
 
-        $host = $request->getHost();
         for($i = 0;$i < count($agreements);$i++){
             if($agreements[$i]['in_documentation'] == true){
-                $agreements[$i]['url'] = "https://{$host}/agreement/{$agreements[$i]["id"]}/";
+                $agreements[$i]['url'] = $request->getUriPrefix() . "/agreement/{$agreements[$i]["id"]}/";
             }
         }
 
